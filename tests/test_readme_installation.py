@@ -1,0 +1,57 @@
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+class ReadmeInstallationTests(unittest.TestCase):
+    def test_english_readme_covers_complete_onboarding(self):
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        required_sections = (
+            "## Requirements",
+            "## Installation",
+            "### Option A — Install as a Codex skill",
+            "### Option B — Run the deterministic tools without installing the skill",
+            "## Prepare your inputs",
+            "## First run",
+            "## Updating",
+            "## Uninstalling",
+            "## Troubleshooting",
+        )
+        for section in required_sections:
+            with self.subTest(section=section):
+                self.assertIn(section, readme)
+
+        self.assertIn(
+            "git clone https://github.com/SSSls/career-fair-battle-plan.git",
+            readme,
+        )
+        self.assertIn("$career-fair-battle-plan", readme)
+
+    def test_chinese_readme_covers_matching_onboarding(self):
+        readme = (ROOT / "README.zh-CN.md").read_text(encoding="utf-8")
+        required_sections = (
+            "## 环境要求",
+            "## 安装",
+            "### 方式 A——安装为 Codex Skill",
+            "### 方式 B——不安装 Skill，直接运行确定性工具",
+            "## 准备输入",
+            "## 第一次运行",
+            "## 更新",
+            "## 卸载",
+            "## 常见问题",
+        )
+        for section in required_sections:
+            with self.subTest(section=section):
+                self.assertIn(section, readme)
+
+        self.assertIn(
+            "git clone https://github.com/SSSls/career-fair-battle-plan.git",
+            readme,
+        )
+        self.assertIn("$career-fair-battle-plan", readme)
+
+
+if __name__ == "__main__":
+    unittest.main()
