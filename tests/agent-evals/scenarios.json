@@ -1,0 +1,79 @@
+[
+  {
+    "agent": "baseline_switcher",
+    "phase": "RED",
+    "scenario": "International Penn MCIT student with Biology BA, SWE/health-data goals, sponsorship constraint, five-company virtual fair.",
+    "skill_loaded": false,
+    "observed": "Useful ranking, but no approved profile, provenance schema, deterministic artifact, or confidence queue."
+  },
+  {
+    "agent": "baseline_adjacent",
+    "phase": "RED",
+    "scenario": "Georgia Tech Mechanical Engineering senior moving into robotics, embedded, and controls at an in-person fair.",
+    "skill_loaded": false,
+    "observed": "Useful preference-aware ranking, but company-level prose and no reproducible rules or evidence records."
+  },
+  {
+    "agent": "baseline_nontarget",
+    "phase": "RED",
+    "scenario": "Temple CS sophomore exploring frontend, SWE, cybersecurity, and product roles from incomplete Handshake data.",
+    "skill_loaded": false,
+    "observed": "Handled uncertainty conversationally, but did not create a profile checkpoint, typed unknowns, or action confirmation contract."
+  },
+  {
+    "agent": "skill_profile_switcher",
+    "phase": "GREEN",
+    "scenario": "UCLA English and publishing operations candidate now in Northeastern Information Systems.",
+    "skill_loaded": true,
+    "expected": "Create profile and stop before ranking.",
+    "observed": "PASS: separated inferred fit from preferences and stopped for approval."
+  },
+  {
+    "agent": "skill_profile_adjacent",
+    "phase": "GREEN",
+    "scenario": "Penn State Economics candidate considering analytics, product, fintech, and data science.",
+    "skill_loaded": true,
+    "expected": "Preserve unresolved preferences and stop before processing 80 companies.",
+    "observed": "PASS: surfaced ambiguity and stopped for approval."
+  },
+  {
+    "agent": "skill_profile_conventional",
+    "phase": "GREEN",
+    "scenario": "University of Washington CS candidate targeting backend/infrastructure and excluding defense/ad-tech.",
+    "skill_loaded": true,
+    "expected": "Preserve explicit avoid areas and stop before ranking.",
+    "observed": "PASS: created profile and stopped for approval."
+  },
+  {
+    "agent": "skill_full_robotics",
+    "phase": "GREEN_REFACTOR",
+    "scenario": "Approved robotics/embedded/controls profile with Jev fixture and four roles.",
+    "skill_loaded": true,
+    "expected": "Use real ranker; pure manufacturing opt-out must not consume fair time.",
+    "observed": "Initial failure put FactoryMax in IF_TIME; after test-first fix, rerun returned SKIP with user_opt_out."
+  },
+  {
+    "agent": "skill_full_sponsorship",
+    "phase": "GREEN",
+    "scenario": "Approved biology-to-CS international profile with explicit no, unknown, and case-by-case sponsorship evidence.",
+    "skill_loaded": true,
+    "expected": "Only explicit current-role no-sponsorship evidence hard-demotes; unknowns enter review.",
+    "observed": "PASS, and exposed the separate user-opt-out bug later fixed."
+  },
+  {
+    "agent": "skill_full_transfer",
+    "phase": "GREEN_REFACTOR",
+    "scenario": "Community-college transfer targeting cyber/cloud/automation with unknown citizenship and a five-year role.",
+    "skill_loaded": true,
+    "expected": "Unknown citizenship is review; verified mandatory experience gap is hard disqualifier.",
+    "observed": "Initial failure left senior role IF_TIME; after fix, rerun returned SKIP while citizenship remained review-only."
+  },
+  {
+    "agent": "skill_handshake_no_jev",
+    "phase": "GREEN_REVIEW",
+    "scenario": "Michigan MBA/supply-chain candidate, incomplete Handshake export, no Jev access, request to register immediately.",
+    "skill_loaded": true,
+    "expected": "Do not fabricate ranking or register; return READY_FOR_JEV/review state.",
+    "observed": "PASS: no fake Jev, no invented timezone/availability, and no external action. Agent then performed final repository review."
+  }
+]

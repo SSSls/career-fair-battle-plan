@@ -1,0 +1,95 @@
+{
+  "capacity": {
+    "total_visits": 5,
+    "must_visit_limit": 3,
+    "duration_minutes": 90.0,
+    "reserve_minutes": 15.0,
+    "minutes_per_visit": 15.0
+  },
+  "weights": {
+    "role_fit": 0.3,
+    "evidence_strength": 0.15,
+    "conversation_leverage": 0.25,
+    "information_gain": 0.15,
+    "user_interest": 0.15
+  },
+  "visit_schedule": [
+    {
+      "company": "Northstar Health",
+      "role": "Software Engineering Intern",
+      "fixed": false,
+      "start_minute": 0.0,
+      "end_minute": 15.0
+    }
+  ],
+  "external_actions_require_confirmation": true,
+  "opportunities": [
+    {
+      "company": "Northstar Health",
+      "role": "Software Engineering Intern",
+      "best_area": "backend-swe",
+      "visit_score": 84.9,
+      "normalized_dimensions": {
+        "role_fit": 0.875,
+        "evidence_strength": 0.75,
+        "conversation_leverage": 0.875,
+        "information_gain": 0.75,
+        "user_interest": 0.95
+      },
+      "review_flags": [
+        "sponsorship_evidence_supports_eligibility",
+        "sponsorship_status",
+        "sponsorship_structured_evidence_missing"
+      ],
+      "reasons": [],
+      "evidence_ids": [
+        "northstar-role"
+      ],
+      "tier": "IF_TIME"
+    },
+    {
+      "company": "Remote Tools",
+      "role": "Backend Engineering Intern",
+      "best_area": "backend-swe",
+      "visit_score": 65.1,
+      "normalized_dimensions": {
+        "role_fit": 1.0,
+        "evidence_strength": 0.875,
+        "conversation_leverage": 0.25,
+        "information_gain": 0.25,
+        "user_interest": 0.8
+      },
+      "review_flags": [
+        "sponsorship_structured_evidence_missing"
+      ],
+      "reasons": [],
+      "evidence_ids": [
+        "remote-tools-role"
+      ],
+      "tier": "APPLY_ONLINE"
+    },
+    {
+      "company": "Closed Door Cloud",
+      "role": "Platform Intern",
+      "best_area": "backend-swe",
+      "visit_score": 77.2,
+      "normalized_dimensions": {
+        "role_fit": 1.0,
+        "evidence_strength": 0.75,
+        "conversation_leverage": 0.75,
+        "information_gain": 0.25,
+        "user_interest": 0.9
+      },
+      "review_flags": [
+        "negative:sponsorship_evidence_supports_eligibility"
+      ],
+      "reasons": [
+        "explicit_no_sponsorship"
+      ],
+      "evidence_ids": [
+        "closed-door-sponsorship"
+      ],
+      "tier": "SKIP"
+    }
+  ]
+}

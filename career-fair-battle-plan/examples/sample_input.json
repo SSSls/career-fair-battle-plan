@@ -1,0 +1,120 @@
+{
+  "candidate_profile": {
+    "approved": true,
+    "needs_sponsorship": true
+  },
+  "fair": {
+    "duration_minutes": 90,
+    "reserve_minutes": 15,
+    "minutes_per_visit": 15
+  },
+  "evidence_records": [
+    {
+      "claim_id": "northstar-role",
+      "claim": "Northstar Health currently lists the supplied Software Engineering Intern role.",
+      "status": "yes",
+      "source_url": "https://example.invalid/northstar/software-intern",
+      "artifact_reference": null,
+      "publisher": "Northstar Health",
+      "published_at": "2026-09-20",
+      "accessed_at": "2026-09-23",
+      "source_quality": "primary",
+      "notes": "Anonymized example source."
+    },
+    {
+      "claim_id": "remote-tools-role",
+      "claim": "Remote Tools currently lists the supplied Backend Engineering Intern role.",
+      "status": "yes",
+      "source_url": "https://example.invalid/remote-tools/backend-intern",
+      "artifact_reference": null,
+      "publisher": "Remote Tools",
+      "published_at": "2026-09-21",
+      "accessed_at": "2026-09-23",
+      "source_quality": "primary",
+      "notes": "Anonymized example source."
+    },
+    {
+      "claim_id": "closed-door-sponsorship",
+      "claim": "The supplied Platform Intern role explicitly does not sponsor.",
+      "status": "yes",
+      "source_url": "https://example.invalid/closed-door/platform-intern",
+      "artifact_reference": null,
+      "publisher": "Closed Door Cloud",
+      "published_at": "2026-09-22",
+      "accessed_at": "2026-09-23",
+      "source_quality": "primary",
+      "notes": "Anonymized example source."
+    }
+  ],
+  "opportunities": [
+    {
+      "company": "Northstar Health",
+      "role": "Software Engineering Intern",
+      "user_interest": 0.95,
+      "evidence_ids": ["northstar-role"],
+      "evidence": {
+        "explicit_no_sponsorship": false,
+        "explicit_disqualifiers": [],
+        "eligibility_unknowns": [],
+        "sponsorship_status": "unknown",
+        "session_status": "verified",
+        "visit_access": "verified"
+      },
+      "judgments": {
+        "role_fit": {"type": "score", "score": 3.5, "confidence": 0.86},
+        "evidence_strength": {"type": "score", "score": 3.0, "confidence": 0.78},
+        "conversation_leverage": {"type": "score", "score": 3.5, "confidence": 0.84},
+        "information_gain": {"type": "score", "score": 3.0, "confidence": 0.75},
+        "best_area": {"type": "choice", "choice": "backend-swe", "confidence": 0.88},
+        "entry_level_accessible": {"type": "noul", "noul": 0.9},
+        "sponsorship_evidence_supports_eligibility": {"type": "noul", "noul": 0.5}
+      }
+    },
+    {
+      "company": "Remote Tools",
+      "role": "Backend Engineering Intern",
+      "user_interest": 0.8,
+      "evidence_ids": ["remote-tools-role"],
+      "evidence": {
+        "explicit_no_sponsorship": false,
+        "explicit_disqualifiers": [],
+        "eligibility_unknowns": [],
+        "sponsorship_status": "yes",
+        "session_status": "full",
+        "visit_access": "unavailable"
+      },
+      "judgments": {
+        "role_fit": {"type": "score", "score": 4.0, "confidence": 0.92},
+        "evidence_strength": {"type": "score", "score": 3.5, "confidence": 0.84},
+        "conversation_leverage": {"type": "score", "score": 1.0, "confidence": 0.8},
+        "information_gain": {"type": "score", "score": 1.0, "confidence": 0.8},
+        "best_area": {"type": "choice", "choice": "backend-swe", "confidence": 0.9},
+        "entry_level_accessible": {"type": "noul", "noul": 0.92},
+        "sponsorship_evidence_supports_eligibility": {"type": "noul", "noul": 0.9}
+      }
+    },
+    {
+      "company": "Closed Door Cloud",
+      "role": "Platform Intern",
+      "user_interest": 0.9,
+      "evidence_ids": ["closed-door-sponsorship"],
+      "evidence": {
+        "explicit_no_sponsorship": true,
+        "explicit_disqualifiers": [],
+        "eligibility_unknowns": [],
+        "sponsorship_status": "no",
+        "session_status": "verified",
+        "visit_access": "verified"
+      },
+      "judgments": {
+        "role_fit": {"type": "score", "score": 4.0, "confidence": 0.9},
+        "evidence_strength": {"type": "score", "score": 3.0, "confidence": 0.8},
+        "conversation_leverage": {"type": "score", "score": 3.0, "confidence": 0.8},
+        "information_gain": {"type": "score", "score": 1.0, "confidence": 0.75},
+        "best_area": {"type": "choice", "choice": "backend-swe", "confidence": 0.9},
+        "entry_level_accessible": {"type": "noul", "noul": 0.9},
+        "sponsorship_evidence_supports_eligibility": {"type": "noul", "noul": 0.05}
+      }
+    }
+  ]
+}

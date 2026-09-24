@@ -1,0 +1,940 @@
+{
+  "summary": {
+    "total": 22,
+    "passed": 22,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "intake-01-unapproved",
+      "description": "Traditional CS profile still needs explicit approval.",
+      "kind": "intake",
+      "changes": {
+        "candidate_profile.approved": false
+      },
+      "passed": true,
+      "details": [
+        "state == 'PROFILE_REVIEW'; actual='PROFILE_REVIEW'"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "PROFILE_REVIEW",
+        "permitted_actions": [
+          "Draft or revise the candidate profile"
+        ],
+        "next_actions": [
+          "Ask the user to correct and explicitly approve the profile."
+        ]
+      }
+    },
+    {
+      "id": "intake-02-missing-school",
+      "description": "A profile without school context returns to review.",
+      "kind": "intake",
+      "changes": {
+        "candidate_profile.school": ""
+      },
+      "passed": true,
+      "details": [
+        "state == 'PROFILE_REVIEW'; actual='PROFILE_REVIEW'",
+        "missing_fields contains 'candidate_profile.school'; actual=['candidate_profile.school']"
+      ],
+      "actual": {
+        "missing_fields": [
+          "candidate_profile.school"
+        ],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "PROFILE_REVIEW",
+        "permitted_actions": [
+          "Draft or revise the candidate profile"
+        ],
+        "next_actions": [
+          "Ask the user to correct and explicitly approve the profile."
+        ]
+      }
+    },
+    {
+      "id": "intake-03-no-target-area",
+      "description": "An undecided candidate must approve at least one generated target area.",
+      "kind": "intake",
+      "changes": {
+        "candidate_profile.target_areas": []
+      },
+      "passed": true,
+      "details": [
+        "state == 'PROFILE_REVIEW'; actual='PROFILE_REVIEW'"
+      ],
+      "actual": {
+        "missing_fields": [
+          "candidate_profile.target_areas"
+        ],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "PROFILE_REVIEW",
+        "permitted_actions": [
+          "Draft or revise the candidate profile"
+        ],
+        "next_actions": [
+          "Ask the user to correct and explicitly approve the profile."
+        ]
+      }
+    },
+    {
+      "id": "intake-04-no-fair-source",
+      "description": "A complete profile but no fair data asks for one supported source.",
+      "kind": "intake",
+      "changes": {
+        "fair.source_mode": null
+      },
+      "passed": true,
+      "details": [
+        "state == 'NEED_FAIR_SOURCE'; actual='NEED_FAIR_SOURCE'"
+      ],
+      "actual": {
+        "missing_fields": [
+          "fair.source_mode"
+        ],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "NEED_FAIR_SOURCE",
+        "permitted_actions": [
+          "Explain the three supported source modes"
+        ],
+        "next_actions": [
+          "Ask for an export, public URL, or user-opened authenticated tab."
+        ]
+      }
+    },
+    {
+      "id": "intake-05-switcher-upload",
+      "description": "A career switcher with a supplied export can proceed read-only.",
+      "kind": "intake",
+      "changes": {
+        "candidate_profile.background_type": "career_switcher",
+        "candidate_profile.school": "Regional University",
+        "candidate_profile.target_areas": [
+          "backend-swe",
+          "data-engineering"
+        ]
+      },
+      "passed": true,
+      "details": [
+        "state == 'READY_FOR_INGESTION'; actual='READY_FOR_INGESTION'"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "READY_FOR_INGESTION",
+        "source_mode": "UPLOAD",
+        "permitted_actions": [
+          "Read user-supplied exports, documents, screenshots, and text"
+        ],
+        "next_actions": [
+          "Ingest available data and preserve missing role or session fields as unknown."
+        ]
+      }
+    },
+    {
+      "id": "intake-06-incomplete-upload",
+      "description": "A company-only export proceeds while missing roles and sessions remain explicit.",
+      "kind": "intake",
+      "changes": {
+        "fair.role_data_present": false,
+        "fair.session_data_present": false
+      },
+      "passed": true,
+      "details": [
+        "state == 'READY_FOR_INGESTION'; actual='READY_FOR_INGESTION'",
+        "missing_fields contains 'fair.role_data_present'; actual=['fair.role_data_present', 'fair.session_data_present']",
+        "missing_fields contains 'fair.session_data_present'; actual=['fair.role_data_present', 'fair.session_data_present']"
+      ],
+      "actual": {
+        "missing_fields": [
+          "fair.role_data_present",
+          "fair.session_data_present"
+        ],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "READY_FOR_INGESTION",
+        "source_mode": "UPLOAD",
+        "permitted_actions": [
+          "Read user-supplied exports, documents, screenshots, and text"
+        ],
+        "next_actions": [
+          "Ingest available data and preserve missing role or session fields as unknown."
+        ]
+      }
+    },
+    {
+      "id": "intake-07-adjacent-public",
+      "description": "An adjacent-field candidate can use a public event page.",
+      "kind": "intake",
+      "changes": {
+        "candidate_profile.background_type": "adjacent_field",
+        "candidate_profile.target_areas": [
+          "quant-developer",
+          "backend-swe"
+        ],
+        "fair.source_mode": "PUBLIC_WEB"
+      },
+      "passed": true,
+      "details": [
+        "state == 'READY_FOR_INGESTION'; actual='READY_FOR_INGESTION'"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "READY_FOR_INGESTION",
+        "source_mode": "PUBLIC_WEB",
+        "permitted_actions": [
+          "Read public event, employer, role, and session pages"
+        ],
+        "next_actions": [
+          "Ingest available data and preserve missing role or session fields as unknown."
+        ]
+      }
+    },
+    {
+      "id": "intake-08-public-no-role-data",
+      "description": "A public exhibitor list without role data is usable but incomplete.",
+      "kind": "intake",
+      "changes": {
+        "fair.source_mode": "PUBLIC_WEB",
+        "fair.role_data_present": false
+      },
+      "passed": true,
+      "details": [
+        "missing_fields contains 'fair.role_data_present'; actual=['fair.role_data_present']"
+      ],
+      "actual": {
+        "missing_fields": [
+          "fair.role_data_present"
+        ],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "READY_FOR_INGESTION",
+        "source_mode": "PUBLIC_WEB",
+        "permitted_actions": [
+          "Read public event, employer, role, and session pages"
+        ],
+        "next_actions": [
+          "Ingest available data and preserve missing role or session fields as unknown."
+        ]
+      }
+    },
+    {
+      "id": "intake-09-auth-login-needed",
+      "description": "A gated Handshake fair pauses for the user to log in themselves.",
+      "kind": "intake",
+      "changes": {
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY"
+      },
+      "passed": true,
+      "details": [
+        "state == 'NEED_USER_LOGIN'; actual='NEED_USER_LOGIN'"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "NEED_USER_LOGIN",
+        "permitted_actions": [
+          "Ask the user to open Handshake and log in themselves"
+        ],
+        "next_actions": [
+          "Wait until the user confirms the authenticated tab is open."
+        ]
+      }
+    },
+    {
+      "id": "intake-10-auth-scope-needed",
+      "description": "A logged-in tab still needs explicit read-only authorization.",
+      "kind": "intake",
+      "changes": {
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY",
+        "access.user_logged_in": true
+      },
+      "passed": true,
+      "details": [
+        "state == 'NEED_READ_ONLY_AUTHORIZATION'; actual='NEED_READ_ONLY_AUTHORIZATION'"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "NEED_READ_ONLY_AUTHORIZATION",
+        "permitted_actions": [
+          "Ask for permission to inspect the visible authenticated tab"
+        ],
+        "next_actions": [
+          "Obtain explicit read-only authorization for this fair."
+        ]
+      }
+    },
+    {
+      "id": "intake-11-auth-ready",
+      "description": "A logged-in, read-only-authorized Handshake tab is ready for visible-data ingestion.",
+      "kind": "intake",
+      "changes": {
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY",
+        "access.user_logged_in": true,
+        "access.authorization_scope": "read_only"
+      },
+      "passed": true,
+      "details": [
+        "state == 'READY_FOR_INGESTION'; actual='READY_FOR_INGESTION'"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "READY_FOR_INGESTION",
+        "source_mode": "AUTHENTICATED_READ_ONLY",
+        "permitted_actions": [
+          "Read visible employer, role, and session data"
+        ],
+        "next_actions": [
+          "Ingest available data and preserve missing role or session fields as unknown."
+        ]
+      }
+    },
+    {
+      "id": "intake-12-credentials-rejected",
+      "description": "Passwords or other credentials are rejected rather than stored.",
+      "kind": "intake",
+      "changes": {
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY",
+        "access.credentials_shared": true
+      },
+      "passed": true,
+      "details": [
+        "error=credentials must not be requested, accepted, or stored"
+      ],
+      "actual": {
+        "error": "credentials must not be requested, accepted, or stored"
+      }
+    },
+    {
+      "id": "rank-13-exact-no-sponsor",
+      "description": "An exact-role no-sponsorship statement is a hard stop when sponsorship is needed.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.needs_sponsorship": true,
+        "opportunities.0.evidence.sponsorship": {
+          "status": "no",
+          "scope": "exact_role",
+          "evidence_id": "sponsor-exact-no"
+        }
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.tier == 'SKIP'; actual='SKIP'",
+        "opportunities.0.reasons contains 'exact_role_no_sponsorship'; actual=['exact_role_no_sponsorship']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [
+              "exact_role_no_sponsorship"
+            ],
+            "evidence_ids": [
+              "sponsor-exact-no"
+            ],
+            "tier": "SKIP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-14-historical-sponsor",
+      "description": "Historical H-1B activity triggers review rather than proving current eligibility.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.needs_sponsorship": true,
+        "opportunities.0.evidence.sponsorship": {
+          "status": "yes",
+          "scope": "company_history",
+          "evidence_id": "sponsor-history"
+        }
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.tier == 'IF_TIME'; actual='IF_TIME'",
+        "opportunities.0.review_flags contains 'sponsorship_not_exact_role'; actual=['sponsorship_not_exact_role']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "fixed": false,
+            "start_minute": 0.0,
+            "end_minute": 15.0
+          }
+        ],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [
+              "sponsorship_not_exact_role"
+            ],
+            "reasons": [],
+            "evidence_ids": [
+              "sponsor-history"
+            ],
+            "tier": "IF_TIME"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-15-salary-hard-fail",
+      "description": "An official exact-role maximum below a hard salary floor causes SKIP.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.salary": {
+          "minimum": 100000,
+          "currency": "USD",
+          "hard_constraint": true
+        },
+        "opportunities.0.evidence.salary": {
+          "min": 70000,
+          "max": 90000,
+          "currency": "USD",
+          "source_type": "official_exact_role",
+          "evidence_id": "salary-official"
+        }
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.tier == 'SKIP'; actual='SKIP'"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [
+              "salary_below_hard_minimum"
+            ],
+            "evidence_ids": [
+              "salary-official"
+            ],
+            "tier": "SKIP"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-16-salary-unknown",
+      "description": "Unknown salary cannot satisfy a hard floor and caps the result at IF_TIME.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.salary": {
+          "minimum": 100000,
+          "currency": "USD",
+          "hard_constraint": true
+        },
+        "opportunities.0.evidence.salary": {
+          "min": null,
+          "max": null,
+          "currency": "USD",
+          "source_type": "unknown",
+          "evidence_id": null
+        }
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.review_flags contains 'salary_unknown_for_hard_minimum'; actual=['salary_unknown_for_hard_minimum']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "fixed": false,
+            "start_minute": 0.0,
+            "end_minute": 15.0
+          }
+        ],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [
+              "salary_unknown_for_hard_minimum"
+            ],
+            "reasons": [],
+            "evidence_ids": [],
+            "tier": "IF_TIME"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-17-headcount-confirmed",
+      "description": "Confirmed active headcount supports MUST_VISIT when headcount matters highly.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.headcount_importance": "high",
+        "opportunities.0.evidence.headcount": {
+          "status": "confirmed",
+          "evidence_id": "hc-confirmed"
+        }
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.tier == 'MUST_VISIT'; actual='MUST_VISIT'"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "fixed": false,
+            "start_minute": 0.0,
+            "end_minute": 15.0
+          }
+        ],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [],
+            "evidence_ids": [
+              "hc-confirmed"
+            ],
+            "tier": "MUST_VISIT"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-18-headcount-unknown",
+      "description": "A job page alone does not prove headcount; unknown caps MUST_VISIT.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.headcount_importance": "high",
+        "opportunities.0.evidence.headcount": {
+          "status": "unknown",
+          "evidence_id": null
+        }
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.tier == 'IF_TIME'; actual='IF_TIME'",
+        "opportunities.0.review_flags contains 'headcount_unknown'; actual=['headcount_unknown']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "fixed": false,
+            "start_minute": 0.0,
+            "end_minute": 15.0
+          }
+        ],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [
+              "headcount_unknown"
+            ],
+            "reasons": [],
+            "evidence_ids": [],
+            "tier": "IF_TIME"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-19-no-visit-channel",
+      "description": "A full session with no booth or group alternative routes to APPLY_ONLINE.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.evidence.session_status": "full",
+        "opportunities.0.evidence.visit_access": "unavailable"
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.tier == 'APPLY_ONLINE'; actual='APPLY_ONLINE'"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [],
+            "evidence_ids": [],
+            "tier": "APPLY_ONLINE"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-20-low-confidence",
+      "description": "Strong-looking fit with low judgment confidence cannot become MUST_VISIT.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.judgments.role_fit.confidence": 0.3
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.tier == 'IF_TIME'; actual='IF_TIME'",
+        "opportunities.0.review_flags contains 'role_fit'; actual=['role_fit']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "fixed": false,
+            "start_minute": 0.0,
+            "end_minute": 15.0
+          }
+        ],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [
+              "role_fit"
+            ],
+            "reasons": [],
+            "evidence_ids": [],
+            "tier": "IF_TIME"
+          }
+        ]
+      }
+    },
+    {
+      "id": "intake-21-handshake-login-required",
+      "description": "A live Handshake fair requires user login even when initially labeled public web.",
+      "kind": "intake",
+      "changes": {
+        "fair.platform": "handshake",
+        "fair.source_mode": "PUBLIC_WEB",
+        "access.user_logged_in": false
+      },
+      "passed": true,
+      "details": [
+        "state == 'NEED_USER_LOGIN'; actual='NEED_USER_LOGIN'"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "NEED_USER_LOGIN",
+        "permitted_actions": [
+          "Ask the user to open Handshake and log in themselves"
+        ],
+        "next_actions": [
+          "Wait until the user confirms the authenticated tab is open."
+        ]
+      }
+    },
+    {
+      "id": "intake-22-handshake-read-only-ready",
+      "description": "After user login and read-only authorization, Handshake is normalized to authenticated read-only ingestion.",
+      "kind": "intake",
+      "changes": {
+        "fair.platform": "handshake",
+        "fair.source_mode": "PUBLIC_WEB",
+        "access.user_logged_in": true,
+        "access.authorization_scope": "read_only"
+      },
+      "passed": true,
+      "details": [
+        "state == 'READY_FOR_INGESTION'; actual='READY_FOR_INGESTION'",
+        "source_mode == 'AUTHENTICATED_READ_ONLY'; actual='AUTHENTICATED_READ_ONLY'"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "READY_FOR_INGESTION",
+        "source_mode": "AUTHENTICATED_READ_ONLY",
+        "permitted_actions": [
+          "Read visible employer, role, and session data"
+        ],
+        "next_actions": [
+          "Ingest available data and preserve missing role or session fields as unknown."
+        ]
+      }
+    }
+  ]
+}

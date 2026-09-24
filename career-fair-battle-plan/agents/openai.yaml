@@ -1,0 +1,6 @@
+interface:
+  display_name: "Career Fair Battle Plan"
+  short_description: "Prioritize fair visits, roles, and follow-ups"
+  default_prompt: "Use $career-fair-battle-plan to turn my resume, goals, and career-fair company list into a time-feasible strategy."
+policy:
+  allow_implicit_invocation: true

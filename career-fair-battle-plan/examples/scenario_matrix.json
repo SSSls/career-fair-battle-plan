@@ -1,0 +1,228 @@
+{
+  "scenarios": [
+    {
+      "id": "intake-01-unapproved",
+      "description": "Traditional CS profile still needs explicit approval.",
+      "kind": "intake",
+      "changes": {"candidate_profile.approved": false},
+      "checks": [{"path": "state", "equals": "PROFILE_REVIEW"}]
+    },
+    {
+      "id": "intake-02-missing-school",
+      "description": "A profile without school context returns to review.",
+      "kind": "intake",
+      "changes": {"candidate_profile.school": ""},
+      "checks": [
+        {"path": "state", "equals": "PROFILE_REVIEW"},
+        {"path": "missing_fields", "contains": "candidate_profile.school"}
+      ]
+    },
+    {
+      "id": "intake-03-no-target-area",
+      "description": "An undecided candidate must approve at least one generated target area.",
+      "kind": "intake",
+      "changes": {"candidate_profile.target_areas": []},
+      "checks": [{"path": "state", "equals": "PROFILE_REVIEW"}]
+    },
+    {
+      "id": "intake-04-no-fair-source",
+      "description": "A complete profile but no fair data asks for one supported source.",
+      "kind": "intake",
+      "changes": {"fair.source_mode": null},
+      "checks": [{"path": "state", "equals": "NEED_FAIR_SOURCE"}]
+    },
+    {
+      "id": "intake-05-switcher-upload",
+      "description": "A career switcher with a supplied export can proceed read-only.",
+      "kind": "intake",
+      "changes": {
+        "candidate_profile.background_type": "career_switcher",
+        "candidate_profile.school": "Regional University",
+        "candidate_profile.target_areas": ["backend-swe", "data-engineering"]
+      },
+      "checks": [{"path": "state", "equals": "READY_FOR_INGESTION"}]
+    },
+    {
+      "id": "intake-06-incomplete-upload",
+      "description": "A company-only export proceeds while missing roles and sessions remain explicit.",
+      "kind": "intake",
+      "changes": {"fair.role_data_present": false, "fair.session_data_present": false},
+      "checks": [
+        {"path": "state", "equals": "READY_FOR_INGESTION"},
+        {"path": "missing_fields", "contains": "fair.role_data_present"},
+        {"path": "missing_fields", "contains": "fair.session_data_present"}
+      ]
+    },
+    {
+      "id": "intake-07-adjacent-public",
+      "description": "An adjacent-field candidate can use a public event page.",
+      "kind": "intake",
+      "changes": {
+        "candidate_profile.background_type": "adjacent_field",
+        "candidate_profile.target_areas": ["quant-developer", "backend-swe"],
+        "fair.source_mode": "PUBLIC_WEB"
+      },
+      "checks": [{"path": "state", "equals": "READY_FOR_INGESTION"}]
+    },
+    {
+      "id": "intake-08-public-no-role-data",
+      "description": "A public exhibitor list without role data is usable but incomplete.",
+      "kind": "intake",
+      "changes": {"fair.source_mode": "PUBLIC_WEB", "fair.role_data_present": false},
+      "checks": [{"path": "missing_fields", "contains": "fair.role_data_present"}]
+    },
+    {
+      "id": "intake-09-auth-login-needed",
+      "description": "A gated Handshake fair pauses for the user to log in themselves.",
+      "kind": "intake",
+      "changes": {"fair.source_mode": "AUTHENTICATED_READ_ONLY"},
+      "checks": [{"path": "state", "equals": "NEED_USER_LOGIN"}]
+    },
+    {
+      "id": "intake-10-auth-scope-needed",
+      "description": "A logged-in tab still needs explicit read-only authorization.",
+      "kind": "intake",
+      "changes": {
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY",
+        "access.user_logged_in": true
+      },
+      "checks": [{"path": "state", "equals": "NEED_READ_ONLY_AUTHORIZATION"}]
+    },
+    {
+      "id": "intake-11-auth-ready",
+      "description": "A logged-in, read-only-authorized Handshake tab is ready for visible-data ingestion.",
+      "kind": "intake",
+      "changes": {
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY",
+        "access.user_logged_in": true,
+        "access.authorization_scope": "read_only"
+      },
+      "checks": [{"path": "state", "equals": "READY_FOR_INGESTION"}]
+    },
+    {
+      "id": "intake-12-credentials-rejected",
+      "description": "Passwords or other credentials are rejected rather than stored.",
+      "kind": "intake",
+      "changes": {
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY",
+        "access.credentials_shared": true
+      },
+      "expected_error": "credentials"
+    },
+    {
+      "id": "rank-13-exact-no-sponsor",
+      "description": "An exact-role no-sponsorship statement is a hard stop when sponsorship is needed.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.needs_sponsorship": true,
+        "opportunities.0.evidence.sponsorship": {"status": "no", "scope": "exact_role", "evidence_id": "sponsor-exact-no"}
+      },
+      "checks": [
+        {"path": "opportunities.0.tier", "equals": "SKIP"},
+        {"path": "opportunities.0.reasons", "contains": "exact_role_no_sponsorship"}
+      ]
+    },
+    {
+      "id": "rank-14-historical-sponsor",
+      "description": "Historical H-1B activity triggers review rather than proving current eligibility.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.needs_sponsorship": true,
+        "opportunities.0.evidence.sponsorship": {"status": "yes", "scope": "company_history", "evidence_id": "sponsor-history"}
+      },
+      "checks": [
+        {"path": "opportunities.0.tier", "equals": "IF_TIME"},
+        {"path": "opportunities.0.review_flags", "contains": "sponsorship_not_exact_role"}
+      ]
+    },
+    {
+      "id": "rank-15-salary-hard-fail",
+      "description": "An official exact-role maximum below a hard salary floor causes SKIP.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.salary": {"minimum": 100000, "currency": "USD", "hard_constraint": true},
+        "opportunities.0.evidence.salary": {"min": 70000, "max": 90000, "currency": "USD", "source_type": "official_exact_role", "evidence_id": "salary-official"}
+      },
+      "checks": [{"path": "opportunities.0.tier", "equals": "SKIP"}]
+    },
+    {
+      "id": "rank-16-salary-unknown",
+      "description": "Unknown salary cannot satisfy a hard floor and caps the result at IF_TIME.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.salary": {"minimum": 100000, "currency": "USD", "hard_constraint": true},
+        "opportunities.0.evidence.salary": {"min": null, "max": null, "currency": "USD", "source_type": "unknown", "evidence_id": null}
+      },
+      "checks": [{"path": "opportunities.0.review_flags", "contains": "salary_unknown_for_hard_minimum"}]
+    },
+    {
+      "id": "rank-17-headcount-confirmed",
+      "description": "Confirmed active headcount supports MUST_VISIT when headcount matters highly.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.headcount_importance": "high",
+        "opportunities.0.evidence.headcount": {"status": "confirmed", "evidence_id": "hc-confirmed"}
+      },
+      "checks": [{"path": "opportunities.0.tier", "equals": "MUST_VISIT"}]
+    },
+    {
+      "id": "rank-18-headcount-unknown",
+      "description": "A job page alone does not prove headcount; unknown caps MUST_VISIT.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.headcount_importance": "high",
+        "opportunities.0.evidence.headcount": {"status": "unknown", "evidence_id": null}
+      },
+      "checks": [
+        {"path": "opportunities.0.tier", "equals": "IF_TIME"},
+        {"path": "opportunities.0.review_flags", "contains": "headcount_unknown"}
+      ]
+    },
+    {
+      "id": "rank-19-no-visit-channel",
+      "description": "A full session with no booth or group alternative routes to APPLY_ONLINE.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.evidence.session_status": "full",
+        "opportunities.0.evidence.visit_access": "unavailable"
+      },
+      "checks": [{"path": "opportunities.0.tier", "equals": "APPLY_ONLINE"}]
+    },
+    {
+      "id": "rank-20-low-confidence",
+      "description": "Strong-looking fit with low judgment confidence cannot become MUST_VISIT.",
+      "kind": "rank",
+      "changes": {"opportunities.0.judgments.role_fit.confidence": 0.3},
+      "checks": [
+        {"path": "opportunities.0.tier", "equals": "IF_TIME"},
+        {"path": "opportunities.0.review_flags", "contains": "role_fit"}
+      ]
+    },
+    {
+      "id": "intake-21-handshake-login-required",
+      "description": "A live Handshake fair requires user login even when initially labeled public web.",
+      "kind": "intake",
+      "changes": {
+        "fair.platform": "handshake",
+        "fair.source_mode": "PUBLIC_WEB",
+        "access.user_logged_in": false
+      },
+      "checks": [{"path": "state", "equals": "NEED_USER_LOGIN"}]
+    },
+    {
+      "id": "intake-22-handshake-read-only-ready",
+      "description": "After user login and read-only authorization, Handshake is normalized to authenticated read-only ingestion.",
+      "kind": "intake",
+      "changes": {
+        "fair.platform": "handshake",
+        "fair.source_mode": "PUBLIC_WEB",
+        "access.user_logged_in": true,
+        "access.authorization_scope": "read_only"
+      },
+      "checks": [
+        {"path": "state", "equals": "READY_FOR_INGESTION"},
+        {"path": "source_mode", "equals": "AUTHENTICATED_READ_ONLY"}
+      ]
+    }
+  ]
+}
