@@ -1,0 +1,14 @@
+{
+  "adapter": "handshake_public_preview",
+  "accessed_at": "2026-09-25",
+  "source_url": "https://fixtures.invalid/handshake/public-preview",
+  "advertised_employer_count": 3,
+  "employers": [
+    {
+      "name": "Example Technology Employer",
+      "job_titles": ["Software Engineering Intern"],
+      "work_authorization_text": "Employer is willing to sponsor candidates",
+      "session_count": 1
+    }
+  ]
+}

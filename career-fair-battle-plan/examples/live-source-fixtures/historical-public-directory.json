@@ -1,0 +1,17 @@
+{
+  "adapter": "external_role_research",
+  "accessed_at": "2026-09-25",
+  "source_url": "https://fixtures.invalid/university/historical-directory",
+  "roles": [
+    {
+      "source_id": "historical-employer-1",
+      "company": "Historical Example Employer",
+      "role": null,
+      "sponsorship": "yes",
+      "scope": "company_history",
+      "published_at": "2024-09-01",
+      "freshness": "stale",
+      "source_quality": "primary"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "adapter": "official_school",
+  "accessed_at": "2026-09-25",
+  "source_url": "https://fixtures.invalid/university/official-fair",
+  "fair": {
+    "name": "Example Engineering Career Fair",
+    "date": "2026-10-02"
+  },
+  "advertised_employer_count": 40,
+  "employer_list_kind": "featured_only",
+  "employers": [
+    {"name": "Featured Example Employer"}
+  ]
+}
