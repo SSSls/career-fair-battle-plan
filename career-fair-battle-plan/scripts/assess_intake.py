@@ -10,7 +10,15 @@ from pathlib import Path
 from typing import Any
 
 
-SOURCE_MODES = {"UPLOAD", "PUBLIC_WEB", "AUTHENTICATED_READ_ONLY"}
+SOURCE_MODES = {
+    "UPLOAD",
+    "PUBLIC_WEB",
+    "PUBLIC_PREVIEW",
+    "AUTHENTICATED_READ_ONLY",
+}
+AUTHENTICATION_STATES = {"NOT_REQUIRED", "LOGGED_OUT", "LOGGED_IN", "UNKNOWN"}
+REGISTRATION_STATES = {"NOT_REQUIRED", "NOT_REGISTERED", "REGISTERED", "UNKNOWN"}
+AUTHORIZATION_SCOPES = {"NONE", "READ_ONLY"}
 PROFILE_FIELDS = (
     "cv_present",
     "school",
@@ -49,6 +57,64 @@ def _missing_fair_fields(fair: dict[str, Any]) -> list[str]:
     return missing
 
 
+def _normalized_access(source_mode: str, access: dict[str, Any]) -> dict[str, Any]:
+    explicit_authentication = access.get("authentication_state")
+    legacy_logged_in = access.get("user_logged_in")
+    if explicit_authentication is None:
+        if source_mode == "AUTHENTICATED_READ_ONLY":
+            authentication_state = (
+                "LOGGED_IN"
+                if legacy_logged_in is True
+                else "LOGGED_OUT"
+                if legacy_logged_in is False
+                else "UNKNOWN"
+            )
+        else:
+            authentication_state = "NOT_REQUIRED"
+    else:
+        authentication_state = explicit_authentication
+    if authentication_state not in AUTHENTICATION_STATES:
+        raise ValueError(
+            "access.authentication_state must be one of: "
+            f"{sorted(AUTHENTICATION_STATES)}"
+        )
+
+    default_registration = (
+        "NOT_REQUIRED" if source_mode in {"UPLOAD", "PUBLIC_WEB"} else "UNKNOWN"
+    )
+    registration_state = access.get("registration_state", default_registration)
+    if registration_state not in REGISTRATION_STATES:
+        raise ValueError(
+            "access.registration_state must be one of: "
+            f"{sorted(REGISTRATION_STATES)}"
+        )
+
+    legacy_scope = access.get("authorization_scope")
+    authorization_scope = (
+        "READ_ONLY" if legacy_scope == "read_only" else legacy_scope or "NONE"
+    )
+    if authorization_scope not in AUTHORIZATION_SCOPES:
+        raise ValueError(
+            "access.authorization_scope must be one of: "
+            f"{sorted(AUTHORIZATION_SCOPES)}"
+        )
+    mutation_allowed = access.get("mutation_allowed", False)
+    if mutation_allowed is not False:
+        raise ValueError("access.mutation_allowed must be false for this read-only skill")
+    if authentication_state == "LOGGED_OUT" and authorization_scope == "READ_ONLY":
+        raise ValueError(
+            "access.authentication_state LOGGED_OUT contradicts READ_ONLY authorization"
+        )
+
+    return {
+        "source_mode": source_mode,
+        "authentication_state": authentication_state,
+        "registration_state": registration_state,
+        "authorization_scope": authorization_scope,
+        "mutation_allowed": False,
+    }
+
+
 def assess_intake(document: dict[str, Any]) -> dict[str, Any]:
     """Return a deterministic intake/access state without external side effects."""
     if not isinstance(document, dict):
@@ -77,6 +143,7 @@ def assess_intake(document: dict[str, Any]) -> dict[str, Any]:
         return {
             **common,
             "state": "PROFILE_REVIEW",
+            "decision_state": "STOP",
             "permitted_actions": ["Draft or revise the candidate profile"],
             "next_actions": ["Ask the user to correct and explicitly approve the profile."],
         }
@@ -86,38 +153,41 @@ def assess_intake(document: dict[str, Any]) -> dict[str, Any]:
         return {
             **common,
             "state": "NEED_FAIR_SOURCE",
-            "permitted_actions": ["Explain the three supported source modes"],
+            "decision_state": "STOP",
+            "permitted_actions": ["Explain the four supported source modes"],
             "next_actions": ["Ask for an export, public URL, or user-opened authenticated tab."],
         }
     if source_mode not in SOURCE_MODES:
         raise ValueError(f"fair.source_mode must be one of: {sorted(SOURCE_MODES)}")
 
+    access_state = _normalized_access(source_mode, access)
+
     platform = fair.get("platform", "generic")
     if not isinstance(platform, str) or not platform:
         raise ValueError("fair.platform must be a non-empty string")
-    handshake_live_fetch = platform.lower() == "handshake" and source_mode != "UPLOAD"
-    requires_login = source_mode == "AUTHENTICATED_READ_ONLY" or handshake_live_fetch
-    effective_source_mode = (
-        "AUTHENTICATED_READ_ONLY" if requires_login else source_mode
-    )
+    requires_login = source_mode == "AUTHENTICATED_READ_ONLY"
 
     if requires_login:
-        if access.get("user_logged_in") is not True:
+        if access_state["authentication_state"] != "LOGGED_IN":
             return {
                 **common,
                 "state": "NEED_USER_LOGIN",
+                "decision_state": "STOP",
+                "access_state": access_state,
                 "permitted_actions": ["Ask the user to open Handshake and log in themselves"],
                 "next_actions": ["Wait until the user confirms the authenticated tab is open."],
             }
-        if access.get("authorization_scope") != "read_only":
+        if access_state["authorization_scope"] != "READ_ONLY":
             return {
                 **common,
                 "state": "NEED_READ_ONLY_AUTHORIZATION",
+                "decision_state": "STOP",
+                "access_state": access_state,
                 "permitted_actions": ["Ask for permission to inspect the visible authenticated tab"],
                 "next_actions": ["Obtain explicit read-only authorization for this fair."],
             }
         permitted = ["Read visible employer, role, and session data"]
-    elif source_mode == "PUBLIC_WEB":
+    elif source_mode in {"PUBLIC_WEB", "PUBLIC_PREVIEW"}:
         permitted = ["Read public event, employer, role, and session pages"]
     else:
         permitted = ["Read user-supplied exports, documents, screenshots, and text"]
@@ -125,7 +195,9 @@ def assess_intake(document: dict[str, Any]) -> dict[str, Any]:
     return {
         **common,
         "state": "READY_FOR_INGESTION",
-        "source_mode": effective_source_mode,
+        "decision_state": "PARTIAL",
+        "source_mode": source_mode,
+        "access_state": access_state,
         "permitted_actions": permitted,
         "next_actions": [
             "Ingest available data and preserve missing role or session fields as unknown."

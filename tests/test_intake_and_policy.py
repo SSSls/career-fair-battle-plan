@@ -150,31 +150,82 @@ class IntakeGateTests(unittest.TestCase):
         self.assertIn("fair.role_data_present", result["missing_fields"])
         self.assertIn("fair.session_data_present", result["missing_fields"])
 
-    def test_handshake_live_fetch_requires_login_even_when_marked_public(self):
-        intake = load_module("assess_intake", INTAKE_SCRIPT)
-        payload = complete_intake("PUBLIC_WEB")
-        payload["fair"]["platform"] = "handshake"
-        payload["access"]["user_logged_in"] = False
-
-        before_login = intake.assess_intake(payload)
-        payload["access"]["user_logged_in"] = True
-        after_login = intake.assess_intake(payload)
-
-        self.assertEqual(before_login["state"], "NEED_USER_LOGIN")
-        self.assertEqual(after_login["state"], "NEED_READ_ONLY_AUTHORIZATION")
-
-    def test_logged_in_handshake_fetch_is_normalized_to_authenticated_read_only(self):
-        intake = load_module("assess_intake", INTAKE_SCRIPT)
-        payload = complete_intake("PUBLIC_WEB")
+    def test_public_handshake_preview_does_not_require_login_or_registration(self):
+        intake = load_module("assess_public_preview", INTAKE_SCRIPT)
+        payload = complete_intake("PUBLIC_PREVIEW")
         payload["fair"]["platform"] = "handshake"
         payload["access"].update(
-            {"user_logged_in": True, "authorization_scope": "read_only"}
+            {
+                "authentication_state": "LOGGED_OUT",
+                "registration_state": "NOT_REGISTERED",
+                "authorization_scope": "NONE",
+                "mutation_allowed": False,
+            }
         )
 
         result = intake.assess_intake(payload)
 
         self.assertEqual(result["state"], "READY_FOR_INGESTION")
-        self.assertEqual(result["source_mode"], "AUTHENTICATED_READ_ONLY")
+        self.assertEqual(result["decision_state"], "PARTIAL")
+        self.assertEqual(
+            result["access_state"]["registration_state"], "NOT_REGISTERED"
+        )
+
+    def test_authenticated_and_not_registered_is_valid_read_only_state(self):
+        intake = load_module("assess_auth_no_registration", INTAKE_SCRIPT)
+        payload = complete_intake("AUTHENTICATED_READ_ONLY")
+        payload["access"].update(
+            {
+                "authentication_state": "LOGGED_IN",
+                "registration_state": "NOT_REGISTERED",
+                "authorization_scope": "READ_ONLY",
+                "mutation_allowed": False,
+            }
+        )
+
+        result = intake.assess_intake(payload)
+
+        self.assertEqual(result["state"], "READY_FOR_INGESTION")
+        self.assertEqual(
+            result["access_state"]["registration_state"], "NOT_REGISTERED"
+        )
+
+    def test_read_only_authorization_rejects_mutation_permission(self):
+        payload = complete_intake("AUTHENTICATED_READ_ONLY")
+        payload["access"].update(
+            {
+                "authentication_state": "LOGGED_IN",
+                "registration_state": "REGISTERED",
+                "authorization_scope": "READ_ONLY",
+                "mutation_allowed": True,
+            }
+        )
+
+        with self.assertRaisesRegex(ValueError, "mutation_allowed"):
+            load_module("assess_mutation", INTAKE_SCRIPT).assess_intake(payload)
+
+    def test_logged_out_cannot_claim_read_only_authorization(self):
+        payload = complete_intake("AUTHENTICATED_READ_ONLY")
+        payload["access"].update(
+            {
+                "authentication_state": "LOGGED_OUT",
+                "registration_state": "NOT_REGISTERED",
+                "authorization_scope": "READ_ONLY",
+                "mutation_allowed": False,
+            }
+        )
+
+        with self.assertRaisesRegex(ValueError, "LOGGED_OUT"):
+            load_module("assess_contradiction", INTAKE_SCRIPT).assess_intake(payload)
+
+    def test_invalid_registration_state_is_rejected(self):
+        payload = complete_intake("PUBLIC_PREVIEW")
+        payload["access"]["registration_state"] = "MAYBE"
+
+        with self.assertRaisesRegex(ValueError, "registration_state"):
+            load_module("assess_invalid_registration", INTAKE_SCRIPT).assess_intake(
+                payload
+            )
 
     def test_uploaded_handshake_export_does_not_require_login(self):
         intake = load_module("assess_intake", INTAKE_SCRIPT)

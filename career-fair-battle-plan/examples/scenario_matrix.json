@@ -199,29 +199,37 @@
       ]
     },
     {
-      "id": "intake-21-handshake-login-required",
-      "description": "A live Handshake fair requires user login even when initially labeled public web.",
+      "id": "intake-21-handshake-public-preview",
+      "description": "A visible Handshake public preview is ingestible without login or registration.",
       "kind": "intake",
       "changes": {
         "fair.platform": "handshake",
-        "fair.source_mode": "PUBLIC_WEB",
-        "access.user_logged_in": false
-      },
-      "checks": [{"path": "state", "equals": "NEED_USER_LOGIN"}]
-    },
-    {
-      "id": "intake-22-handshake-read-only-ready",
-      "description": "After user login and read-only authorization, Handshake is normalized to authenticated read-only ingestion.",
-      "kind": "intake",
-      "changes": {
-        "fair.platform": "handshake",
-        "fair.source_mode": "PUBLIC_WEB",
-        "access.user_logged_in": true,
-        "access.authorization_scope": "read_only"
+        "fair.source_mode": "PUBLIC_PREVIEW",
+        "access.authentication_state": "LOGGED_OUT",
+        "access.registration_state": "NOT_REGISTERED",
+        "access.authorization_scope": "NONE"
       },
       "checks": [
         {"path": "state", "equals": "READY_FOR_INGESTION"},
-        {"path": "source_mode", "equals": "AUTHENTICATED_READ_ONLY"}
+        {"path": "decision_state", "equals": "PARTIAL"},
+        {"path": "access_state.registration_state", "equals": "NOT_REGISTERED"}
+      ]
+    },
+    {
+      "id": "intake-22-handshake-read-only-ready",
+      "description": "Authenticated Handshake read-only access remains independent from event registration.",
+      "kind": "intake",
+      "changes": {
+        "fair.platform": "handshake",
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY",
+        "access.authentication_state": "LOGGED_IN",
+        "access.registration_state": "NOT_REGISTERED",
+        "access.authorization_scope": "READ_ONLY"
+      },
+      "checks": [
+        {"path": "state", "equals": "READY_FOR_INGESTION"},
+        {"path": "source_mode", "equals": "AUTHENTICATED_READ_ONLY"},
+        {"path": "access_state.registration_state", "equals": "NOT_REGISTERED"}
       ]
     }
   ]
