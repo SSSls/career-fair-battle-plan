@@ -1,7 +1,7 @@
 {
   "summary": {
-    "total": 22,
-    "passed": 22,
+    "total": 57,
+    "passed": 57,
     "failed": 0
   },
   "results": [
@@ -26,6 +26,7 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "PROFILE_REVIEW",
+        "decision_state": "STOP",
         "permitted_actions": [
           "Draft or revise the candidate profile"
         ],
@@ -58,6 +59,7 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "PROFILE_REVIEW",
+        "decision_state": "STOP",
         "permitted_actions": [
           "Draft or revise the candidate profile"
         ],
@@ -89,6 +91,7 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "PROFILE_REVIEW",
+        "decision_state": "STOP",
         "permitted_actions": [
           "Draft or revise the candidate profile"
         ],
@@ -120,8 +123,9 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "NEED_FAIR_SOURCE",
+        "decision_state": "STOP",
         "permitted_actions": [
-          "Explain the three supported source modes"
+          "Explain the four supported source modes"
         ],
         "next_actions": [
           "Ask for an export, public URL, or user-opened authenticated tab."
@@ -154,7 +158,15 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "READY_FOR_INGESTION",
+        "decision_state": "PARTIAL",
         "source_mode": "UPLOAD",
+        "access_state": {
+          "source_mode": "UPLOAD",
+          "authentication_state": "NOT_REQUIRED",
+          "registration_state": "NOT_REQUIRED",
+          "authorization_scope": "NONE",
+          "mutation_allowed": false
+        },
         "permitted_actions": [
           "Read user-supplied exports, documents, screenshots, and text"
         ],
@@ -190,7 +202,15 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "READY_FOR_INGESTION",
+        "decision_state": "PARTIAL",
         "source_mode": "UPLOAD",
+        "access_state": {
+          "source_mode": "UPLOAD",
+          "authentication_state": "NOT_REQUIRED",
+          "registration_state": "NOT_REQUIRED",
+          "authorization_scope": "NONE",
+          "mutation_allowed": false
+        },
         "permitted_actions": [
           "Read user-supplied exports, documents, screenshots, and text"
         ],
@@ -225,7 +245,15 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "READY_FOR_INGESTION",
+        "decision_state": "PARTIAL",
         "source_mode": "PUBLIC_WEB",
+        "access_state": {
+          "source_mode": "PUBLIC_WEB",
+          "authentication_state": "NOT_REQUIRED",
+          "registration_state": "NOT_REQUIRED",
+          "authorization_scope": "NONE",
+          "mutation_allowed": false
+        },
         "permitted_actions": [
           "Read public event, employer, role, and session pages"
         ],
@@ -258,7 +286,15 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "READY_FOR_INGESTION",
+        "decision_state": "PARTIAL",
         "source_mode": "PUBLIC_WEB",
+        "access_state": {
+          "source_mode": "PUBLIC_WEB",
+          "authentication_state": "NOT_REQUIRED",
+          "registration_state": "NOT_REQUIRED",
+          "authorization_scope": "NONE",
+          "mutation_allowed": false
+        },
         "permitted_actions": [
           "Read public event, employer, role, and session pages"
         ],
@@ -288,6 +324,14 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "NEED_USER_LOGIN",
+        "decision_state": "STOP",
+        "access_state": {
+          "source_mode": "AUTHENTICATED_READ_ONLY",
+          "authentication_state": "LOGGED_OUT",
+          "registration_state": "UNKNOWN",
+          "authorization_scope": "NONE",
+          "mutation_allowed": false
+        },
         "permitted_actions": [
           "Ask the user to open Handshake and log in themselves"
         ],
@@ -318,6 +362,14 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "NEED_READ_ONLY_AUTHORIZATION",
+        "decision_state": "STOP",
+        "access_state": {
+          "source_mode": "AUTHENTICATED_READ_ONLY",
+          "authentication_state": "LOGGED_IN",
+          "registration_state": "UNKNOWN",
+          "authorization_scope": "NONE",
+          "mutation_allowed": false
+        },
         "permitted_actions": [
           "Ask for permission to inspect the visible authenticated tab"
         ],
@@ -349,7 +401,15 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "READY_FOR_INGESTION",
+        "decision_state": "PARTIAL",
         "source_mode": "AUTHENTICATED_READ_ONLY",
+        "access_state": {
+          "source_mode": "AUTHENTICATED_READ_ONLY",
+          "authentication_state": "LOGGED_IN",
+          "registration_state": "UNKNOWN",
+          "authorization_scope": "READ_ONLY",
+          "mutation_allowed": false
+        },
         "permitted_actions": [
           "Read visible employer, role, and session data"
         ],
@@ -413,12 +473,12 @@
             "company": "Example Co",
             "role": "Software Intern",
             "best_area": "backend-swe",
-            "visit_score": 96.2,
+            "visit_score": 15.0,
             "normalized_dimensions": {
-              "role_fit": 1.0,
-              "evidence_strength": 1.0,
-              "conversation_leverage": 1.0,
-              "information_gain": 0.75,
+              "role_fit": 0.0,
+              "evidence_strength": 0.0,
+              "conversation_leverage": 0.0,
+              "information_gain": 0.0,
               "user_interest": 1.0
             },
             "review_flags": [],
@@ -428,7 +488,29 @@
             "evidence_ids": [
               "sponsor-exact-no"
             ],
-            "tier": "SKIP"
+            "evidence_records": [
+              {
+                "claim_id": "sponsor-exact-no",
+                "claim": "Exact role says no sponsorship."
+              }
+            ],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "sponsorship": {
+                "status": "no",
+                "scope": "exact_role",
+                "evidence_id": "sponsor-exact-no"
+              }
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "BLOCKED",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "SKIP",
+            "route_action": "SKIP",
+            "route_exclusion_reason": "exact_role_no_sponsorship"
           }
         ]
       }
@@ -495,7 +577,33 @@
             "evidence_ids": [
               "sponsor-history"
             ],
-            "tier": "IF_TIME"
+            "evidence_records": [
+              {
+                "claim_id": "sponsor-history",
+                "claim": "Company sponsored historically."
+              }
+            ],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "sponsorship": {
+                "status": "yes",
+                "scope": "company_history",
+                "evidence_id": "sponsor-history"
+              }
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "IF_TIME",
+            "assigned_session": {
+              "start_minute": 0.0,
+              "end_minute": 15.0
+            },
+            "route_action": "VISIT",
+            "route_exclusion_reason": null
           }
         ]
       }
@@ -544,12 +652,12 @@
             "company": "Example Co",
             "role": "Software Intern",
             "best_area": "backend-swe",
-            "visit_score": 96.2,
+            "visit_score": 15.0,
             "normalized_dimensions": {
-              "role_fit": 1.0,
-              "evidence_strength": 1.0,
-              "conversation_leverage": 1.0,
-              "information_gain": 0.75,
+              "role_fit": 0.0,
+              "evidence_strength": 0.0,
+              "conversation_leverage": 0.0,
+              "information_gain": 0.0,
               "user_interest": 1.0
             },
             "review_flags": [],
@@ -559,7 +667,31 @@
             "evidence_ids": [
               "salary-official"
             ],
-            "tier": "SKIP"
+            "evidence_records": [
+              {
+                "claim_id": "salary-official",
+                "claim": "Official exact-role salary range."
+              }
+            ],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "salary": {
+                "min": 70000,
+                "max": 90000,
+                "currency": "USD",
+                "source_type": "official_exact_role",
+                "evidence_id": "salary-official"
+              }
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "BLOCKED",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "SKIP",
+            "route_action": "SKIP",
+            "route_exclusion_reason": "salary_below_hard_minimum"
           }
         ]
       }
@@ -629,7 +761,30 @@
             ],
             "reasons": [],
             "evidence_ids": [],
-            "tier": "IF_TIME"
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "salary": {
+                "min": null,
+                "max": null,
+                "currency": "USD",
+                "source_type": "unknown",
+                "evidence_id": null
+              }
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "IF_TIME",
+            "assigned_session": {
+              "start_minute": 0.0,
+              "end_minute": 15.0
+            },
+            "route_action": "VISIT",
+            "route_exclusion_reason": null
           }
         ]
       }
@@ -692,7 +847,32 @@
             "evidence_ids": [
               "hc-confirmed"
             ],
-            "tier": "MUST_VISIT"
+            "evidence_records": [
+              {
+                "claim_id": "hc-confirmed",
+                "claim": "Employer confirmed active headcount."
+              }
+            ],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "headcount": {
+                "status": "confirmed",
+                "evidence_id": "hc-confirmed"
+              }
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "MUST_VISIT",
+            "assigned_session": {
+              "start_minute": 0.0,
+              "end_minute": 15.0
+            },
+            "route_action": "VISIT",
+            "route_exclusion_reason": null
           }
         ]
       }
@@ -756,7 +936,27 @@
             ],
             "reasons": [],
             "evidence_ids": [],
-            "tier": "IF_TIME"
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "headcount": {
+                "status": "unknown",
+                "evidence_id": null
+              }
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "IF_TIME",
+            "assigned_session": {
+              "start_minute": 0.0,
+              "end_minute": 15.0
+            },
+            "route_action": "VISIT",
+            "route_exclusion_reason": null
           }
         ]
       }
@@ -795,18 +995,32 @@
             "company": "Example Co",
             "role": "Software Intern",
             "best_area": "backend-swe",
-            "visit_score": 96.2,
+            "visit_score": 15.0,
             "normalized_dimensions": {
-              "role_fit": 1.0,
-              "evidence_strength": 1.0,
-              "conversation_leverage": 1.0,
-              "information_gain": 0.75,
+              "role_fit": 0.0,
+              "evidence_strength": 0.0,
+              "conversation_leverage": 0.0,
+              "information_gain": 0.0,
               "user_interest": 1.0
             },
             "review_flags": [],
-            "reasons": [],
+            "reasons": [
+              "visit_channel_unavailable"
+            ],
             "evidence_ids": [],
-            "tier": "APPLY_ONLINE"
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "full",
+              "visit_access": "unavailable"
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "BLOCKED",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "APPLY_ONLINE",
+            "route_action": "APPLY_ONLINE",
+            "route_exclusion_reason": "visit_channel_unavailable"
           }
         ]
       }
@@ -866,56 +1080,43 @@
             ],
             "reasons": [],
             "evidence_ids": [],
-            "tier": "IF_TIME"
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified"
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "IF_TIME",
+            "assigned_session": {
+              "start_minute": 0.0,
+              "end_minute": 15.0
+            },
+            "route_action": "VISIT",
+            "route_exclusion_reason": null
           }
         ]
       }
     },
     {
-      "id": "intake-21-handshake-login-required",
-      "description": "A live Handshake fair requires user login even when initially labeled public web.",
+      "id": "intake-21-handshake-public-preview",
+      "description": "A visible Handshake public preview is ingestible without login or registration.",
       "kind": "intake",
       "changes": {
         "fair.platform": "handshake",
-        "fair.source_mode": "PUBLIC_WEB",
-        "access.user_logged_in": false
-      },
-      "passed": true,
-      "details": [
-        "state == 'NEED_USER_LOGIN'; actual='NEED_USER_LOGIN'"
-      ],
-      "actual": {
-        "missing_fields": [],
-        "forbidden_actions": [
-          "Request or store passwords",
-          "Handle MFA codes or solve CAPTCHAs",
-          "Bypass authentication or use hidden private endpoints",
-          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
-        ],
-        "external_mutations_require_confirmation": true,
-        "state": "NEED_USER_LOGIN",
-        "permitted_actions": [
-          "Ask the user to open Handshake and log in themselves"
-        ],
-        "next_actions": [
-          "Wait until the user confirms the authenticated tab is open."
-        ]
-      }
-    },
-    {
-      "id": "intake-22-handshake-read-only-ready",
-      "description": "After user login and read-only authorization, Handshake is normalized to authenticated read-only ingestion.",
-      "kind": "intake",
-      "changes": {
-        "fair.platform": "handshake",
-        "fair.source_mode": "PUBLIC_WEB",
-        "access.user_logged_in": true,
-        "access.authorization_scope": "read_only"
+        "fair.source_mode": "PUBLIC_PREVIEW",
+        "access.authentication_state": "LOGGED_OUT",
+        "access.registration_state": "NOT_REGISTERED",
+        "access.authorization_scope": "NONE"
       },
       "passed": true,
       "details": [
         "state == 'READY_FOR_INGESTION'; actual='READY_FOR_INGESTION'",
-        "source_mode == 'AUTHENTICATED_READ_ONLY'; actual='AUTHENTICATED_READ_ONLY'"
+        "decision_state == 'PARTIAL'; actual='PARTIAL'",
+        "access_state.registration_state == 'NOT_REGISTERED'; actual='NOT_REGISTERED'"
       ],
       "actual": {
         "missing_fields": [],
@@ -927,13 +1128,2109 @@
         ],
         "external_mutations_require_confirmation": true,
         "state": "READY_FOR_INGESTION",
+        "decision_state": "PARTIAL",
+        "source_mode": "PUBLIC_PREVIEW",
+        "access_state": {
+          "source_mode": "PUBLIC_PREVIEW",
+          "authentication_state": "LOGGED_OUT",
+          "registration_state": "NOT_REGISTERED",
+          "authorization_scope": "NONE",
+          "mutation_allowed": false
+        },
+        "permitted_actions": [
+          "Read public event, employer, role, and session pages"
+        ],
+        "next_actions": [
+          "Ingest available data and preserve missing role or session fields as unknown."
+        ]
+      }
+    },
+    {
+      "id": "intake-22-handshake-read-only-ready",
+      "description": "Authenticated Handshake read-only access remains independent from event registration.",
+      "kind": "intake",
+      "changes": {
+        "fair.platform": "handshake",
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY",
+        "access.authentication_state": "LOGGED_IN",
+        "access.registration_state": "NOT_REGISTERED",
+        "access.authorization_scope": "READ_ONLY"
+      },
+      "passed": true,
+      "details": [
+        "state == 'READY_FOR_INGESTION'; actual='READY_FOR_INGESTION'",
+        "source_mode == 'AUTHENTICATED_READ_ONLY'; actual='AUTHENTICATED_READ_ONLY'",
+        "access_state.registration_state == 'NOT_REGISTERED'; actual='NOT_REGISTERED'"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "READY_FOR_INGESTION",
+        "decision_state": "PARTIAL",
         "source_mode": "AUTHENTICATED_READ_ONLY",
+        "access_state": {
+          "source_mode": "AUTHENTICATED_READ_ONLY",
+          "authentication_state": "LOGGED_IN",
+          "registration_state": "NOT_REGISTERED",
+          "authorization_scope": "READ_ONLY",
+          "mutation_allowed": false
+        },
         "permitted_actions": [
           "Read visible employer, role, and session data"
         ],
         "next_actions": [
           "Ingest available data and preserve missing role or session fields as unknown."
         ]
+      }
+    },
+    {
+      "id": "intake-23-registered-read-only",
+      "description": "Registration and read-only authorization can both be visible without granting mutation permission.",
+      "kind": "intake",
+      "changes": {
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY",
+        "access.authentication_state": "LOGGED_IN",
+        "access.registration_state": "REGISTERED",
+        "access.authorization_scope": "READ_ONLY",
+        "access.mutation_allowed": false
+      },
+      "passed": true,
+      "details": [
+        "state == 'READY_FOR_INGESTION'; actual='READY_FOR_INGESTION'",
+        "access_state.mutation_allowed == False; actual=False"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "READY_FOR_INGESTION",
+        "decision_state": "PARTIAL",
+        "source_mode": "AUTHENTICATED_READ_ONLY",
+        "access_state": {
+          "source_mode": "AUTHENTICATED_READ_ONLY",
+          "authentication_state": "LOGGED_IN",
+          "registration_state": "REGISTERED",
+          "authorization_scope": "READ_ONLY",
+          "mutation_allowed": false
+        },
+        "permitted_actions": [
+          "Read visible employer, role, and session data"
+        ],
+        "next_actions": [
+          "Ingest available data and preserve missing role or session fields as unknown."
+        ]
+      }
+    },
+    {
+      "id": "intake-24-temporary-authorization",
+      "description": "Temporary work authorization is recorded as user input rather than inferred.",
+      "kind": "intake",
+      "changes": {
+        "candidate_profile.work_authorization": "temporary student work authorization",
+        "candidate_profile.needs_sponsorship": true
+      },
+      "passed": true,
+      "details": [
+        "state == 'READY_FOR_INGESTION'; actual='READY_FOR_INGESTION'"
+      ],
+      "actual": {
+        "missing_fields": [],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "READY_FOR_INGESTION",
+        "decision_state": "PARTIAL",
+        "source_mode": "UPLOAD",
+        "access_state": {
+          "source_mode": "UPLOAD",
+          "authentication_state": "NOT_REQUIRED",
+          "registration_state": "NOT_REQUIRED",
+          "authorization_scope": "NONE",
+          "mutation_allowed": false
+        },
+        "permitted_actions": [
+          "Read user-supplied exports, documents, screenshots, and text"
+        ],
+        "next_actions": [
+          "Ingest available data and preserve missing role or session fields as unknown."
+        ]
+      }
+    },
+    {
+      "id": "normalize-25-partial-six-of-eleven",
+      "description": "A six-card public preview never claims complete eleven-employer coverage.",
+      "kind": "normalize",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "coverage.visible == 6; actual=6",
+        "coverage.advertised == 11; actual=11",
+        "coverage.complete == False; actual=False"
+      ],
+      "actual": {
+        "adapter": "handshake_public_preview",
+        "source_mode": "PUBLIC_PREVIEW",
+        "coverage": {
+          "visible": 6,
+          "advertised": 11,
+          "complete": false
+        },
+        "access_requirements": [],
+        "leads": [
+          {
+            "company": "Employer 1",
+            "role": null,
+            "evidence_level": "EMPLOYER_CARD",
+            "visit_access": "unknown",
+            "session_status": "unknown",
+            "evidence_ids": [
+              "employer-card-1"
+            ]
+          },
+          {
+            "company": "Employer 2",
+            "role": null,
+            "evidence_level": "EMPLOYER_CARD",
+            "visit_access": "unknown",
+            "session_status": "unknown",
+            "evidence_ids": [
+              "employer-card-2"
+            ]
+          },
+          {
+            "company": "Employer 3",
+            "role": null,
+            "evidence_level": "EMPLOYER_CARD",
+            "visit_access": "unknown",
+            "session_status": "unknown",
+            "evidence_ids": [
+              "employer-card-3"
+            ]
+          },
+          {
+            "company": "Employer 4",
+            "role": null,
+            "evidence_level": "EMPLOYER_CARD",
+            "visit_access": "unknown",
+            "session_status": "unknown",
+            "evidence_ids": [
+              "employer-card-4"
+            ]
+          },
+          {
+            "company": "Employer 5",
+            "role": null,
+            "evidence_level": "EMPLOYER_CARD",
+            "visit_access": "unknown",
+            "session_status": "unknown",
+            "evidence_ids": [
+              "employer-card-5"
+            ]
+          },
+          {
+            "company": "Employer 6",
+            "role": null,
+            "evidence_level": "EMPLOYER_CARD",
+            "visit_access": "unknown",
+            "session_status": "unknown",
+            "evidence_ids": [
+              "employer-card-6"
+            ]
+          }
+        ],
+        "evidence_records": [
+          {
+            "claim_id": "employer-card-1",
+            "claim": "Employer 1 is visible on the event employer card.",
+            "scope": "employer_event_card",
+            "field": "employer",
+            "status": "yes",
+            "source_quality": "primary",
+            "source_url": "https://fixtures.invalid/partial-preview",
+            "artifact_reference": null,
+            "published_at": null,
+            "accessed_at": "2026-09-25",
+            "freshness": "unknown"
+          },
+          {
+            "claim_id": "employer-card-2",
+            "claim": "Employer 2 is visible on the event employer card.",
+            "scope": "employer_event_card",
+            "field": "employer",
+            "status": "yes",
+            "source_quality": "primary",
+            "source_url": "https://fixtures.invalid/partial-preview",
+            "artifact_reference": null,
+            "published_at": null,
+            "accessed_at": "2026-09-25",
+            "freshness": "unknown"
+          },
+          {
+            "claim_id": "employer-card-3",
+            "claim": "Employer 3 is visible on the event employer card.",
+            "scope": "employer_event_card",
+            "field": "employer",
+            "status": "yes",
+            "source_quality": "primary",
+            "source_url": "https://fixtures.invalid/partial-preview",
+            "artifact_reference": null,
+            "published_at": null,
+            "accessed_at": "2026-09-25",
+            "freshness": "unknown"
+          },
+          {
+            "claim_id": "employer-card-4",
+            "claim": "Employer 4 is visible on the event employer card.",
+            "scope": "employer_event_card",
+            "field": "employer",
+            "status": "yes",
+            "source_quality": "primary",
+            "source_url": "https://fixtures.invalid/partial-preview",
+            "artifact_reference": null,
+            "published_at": null,
+            "accessed_at": "2026-09-25",
+            "freshness": "unknown"
+          },
+          {
+            "claim_id": "employer-card-5",
+            "claim": "Employer 5 is visible on the event employer card.",
+            "scope": "employer_event_card",
+            "field": "employer",
+            "status": "yes",
+            "source_quality": "primary",
+            "source_url": "https://fixtures.invalid/partial-preview",
+            "artifact_reference": null,
+            "published_at": null,
+            "accessed_at": "2026-09-25",
+            "freshness": "unknown"
+          },
+          {
+            "claim_id": "employer-card-6",
+            "claim": "Employer 6 is visible on the event employer card.",
+            "scope": "employer_event_card",
+            "field": "employer",
+            "status": "yes",
+            "source_quality": "primary",
+            "source_url": "https://fixtures.invalid/partial-preview",
+            "artifact_reference": null,
+            "published_at": null,
+            "accessed_at": "2026-09-25",
+            "freshness": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "normalize-26-official-incomplete",
+      "description": "Featured employers on an official school page remain an incomplete list.",
+      "kind": "normalize",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "coverage.complete == False; actual=False"
+      ],
+      "actual": {
+        "adapter": "official_school",
+        "source_mode": "PUBLIC_WEB",
+        "fair": {
+          "name": "Engineering Fair",
+          "date": "2026-10-02"
+        },
+        "coverage": {
+          "visible": 1,
+          "advertised": 40,
+          "complete": false
+        },
+        "access_requirements": [],
+        "leads": [
+          {
+            "company": "Featured Employer",
+            "role": null,
+            "evidence_level": "EMPLOYER_NAME",
+            "visit_access": "unknown",
+            "session_status": "unknown",
+            "evidence_ids": [
+              "official-employer-1"
+            ]
+          }
+        ],
+        "evidence_records": [
+          {
+            "claim_id": "official-employer-1",
+            "claim": "Official event page names Featured Employer.",
+            "scope": "event",
+            "field": "employer",
+            "status": "yes",
+            "source_quality": "primary",
+            "source_url": "https://fixtures.invalid/official-partial",
+            "artifact_reference": null,
+            "published_at": null,
+            "accessed_at": "2026-09-25",
+            "freshness": "unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "normalize-27-login-wall",
+      "description": "An official login wall reports the access boundary without inventing employers.",
+      "kind": "normalize",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "access_requirements contains 'login_required_for_employer_list'; actual=['login_required_for_employer_list']",
+        "leads == []; actual=[]"
+      ],
+      "actual": {
+        "adapter": "official_school",
+        "source_mode": "PUBLIC_WEB",
+        "fair": {
+          "name": "Technical Fair",
+          "date": "2026-10-10"
+        },
+        "coverage": {
+          "visible": 0,
+          "advertised": null,
+          "complete": false
+        },
+        "access_requirements": [
+          "login_required_for_employer_list"
+        ],
+        "leads": [],
+        "evidence_records": []
+      }
+    },
+    {
+      "id": "normalize-28-stale-history",
+      "description": "Historical sponsorship remains stale company history.",
+      "kind": "normalize",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "evidence_records.0.scope == 'company_history'; actual='company_history'",
+        "evidence_records.0.freshness == 'stale'; actual='stale'"
+      ],
+      "actual": {
+        "adapter": "external_role_research",
+        "source_mode": "PUBLIC_WEB",
+        "coverage": {
+          "visible": 1,
+          "advertised": 1,
+          "complete": true
+        },
+        "access_requirements": [],
+        "leads": [
+          {
+            "company": "Historical Employer",
+            "role": null,
+            "evidence_level": "EMPLOYER_NAME",
+            "visit_access": "unknown",
+            "session_status": "unknown",
+            "evidence_ids": [
+              "history-1"
+            ]
+          }
+        ],
+        "evidence_records": [
+          {
+            "claim_id": "history-1",
+            "claim": "Source reports sponsorship status yes at company_history scope.",
+            "scope": "company_history",
+            "field": "sponsorship",
+            "status": "yes",
+            "source_quality": "primary",
+            "source_url": "https://fixtures.invalid/history",
+            "artifact_reference": null,
+            "published_at": "2024-09-01",
+            "accessed_at": "2026-09-25",
+            "freshness": "stale"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-29-conflicting-sponsor-scopes",
+      "description": "Conflicting company history and exact negative evidence use the exact-role hard fact.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.needs_sponsorship": true,
+        "opportunities.0.evidence.explicit_no_sponsorship": true,
+        "opportunities.0.evidence.sponsorship": {
+          "status": "yes",
+          "scope": "company_history",
+          "evidence_id": "sponsor-history"
+        }
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.tier == 'SKIP'; actual='SKIP'",
+        "opportunities.0.review_flags contains 'sponsorship_not_exact_role'; actual=['sponsorship_not_exact_role']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 15.0,
+            "normalized_dimensions": {
+              "role_fit": 0.0,
+              "evidence_strength": 0.0,
+              "conversation_leverage": 0.0,
+              "information_gain": 0.0,
+              "user_interest": 1.0
+            },
+            "review_flags": [
+              "sponsorship_not_exact_role"
+            ],
+            "reasons": [
+              "explicit_no_sponsorship"
+            ],
+            "evidence_ids": [
+              "sponsor-history"
+            ],
+            "evidence_records": [
+              {
+                "claim_id": "sponsor-history",
+                "claim": "Company sponsored historically."
+              }
+            ],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "explicit_no_sponsorship": true,
+              "sponsorship": {
+                "status": "yes",
+                "scope": "company_history",
+                "evidence_id": "sponsor-history"
+              }
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "BLOCKED",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "SKIP",
+            "route_action": "SKIP",
+            "route_exclusion_reason": "explicit_no_sponsorship"
+          }
+        ]
+      }
+    },
+    {
+      "id": "jev-30-adjacent-transition",
+      "description": "An adjacent transition adds a background-pathway judgment.",
+      "kind": "jev_plan",
+      "changes": {
+        "candidate_profile.background_transition": "adjacent"
+      },
+      "passed": true,
+      "details": [
+        "requests.0.questions.3.name == 'background_pathway_accessible'; actual='background_pathway_accessible'"
+      ],
+      "actual": {
+        "state": "READY_FOR_JEV",
+        "provider": null,
+        "model": null,
+        "request_count": 1,
+        "question_count": 4,
+        "requests": [
+          {
+            "request_id": "opportunity-1",
+            "subject": {
+              "company": "Example Co",
+              "role": "Software Intern"
+            },
+            "state": {
+              "candidate": {
+                "approved_areas": [
+                  "backend-swe",
+                  "data-engineering"
+                ],
+                "demonstrated_strengths": [
+                  "Python APIs"
+                ],
+                "background_transition": "adjacent",
+                "career_stage": "student",
+                "hard_constraints": {
+                  "needs_sponsorship": false
+                }
+              },
+              "opportunity": {
+                "company": "Example Co",
+                "role": "Software Intern",
+                "evidence_level": "EXACT_ROLE",
+                "evidence_summary": [
+                  {
+                    "scope": "exact_role",
+                    "field": "role",
+                    "status": "yes",
+                    "source_quality": "primary"
+                  }
+                ],
+                "material_unknowns": [],
+                "conversation_channel": "unavailable"
+              }
+            },
+            "questions": [
+              {
+                "name": "best_area",
+                "type": "choice",
+                "prompt": "Which approved target area best matches this opportunity?",
+                "options": [
+                  "backend-swe",
+                  "data-engineering",
+                  "other"
+                ]
+              },
+              {
+                "name": "role_fit",
+                "type": "score",
+                "prompt": "How strongly does this role fit the approved candidate profile?",
+                "minimum": 0,
+                "maximum": 4
+              },
+              {
+                "name": "evidence_strength",
+                "type": "score",
+                "prompt": "How strongly does the supplied evidence support the match?",
+                "minimum": 0,
+                "maximum": 4
+              },
+              {
+                "name": "background_pathway_accessible",
+                "type": "noul",
+                "prompt": "Is the candidate's background transition a plausible pathway into this role?"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "jev-31-major-transition-sponsor",
+      "description": "A major transition with unresolved sponsorship asks both pathway and sponsorship questions.",
+      "kind": "jev_plan",
+      "changes": {
+        "candidate_profile.background_transition": "major",
+        "candidate_profile.needs_sponsorship": true,
+        "opportunities.0.exact_role_sponsorship": "unknown"
+      },
+      "passed": true,
+      "details": [
+        "requests.0.questions.3.name == 'background_pathway_accessible'; actual='background_pathway_accessible'",
+        "requests.0.questions.4.name == 'sponsorship_evidence_supports_eligibility'; actual='sponsorship_evidence_supports_eligibility'"
+      ],
+      "actual": {
+        "state": "READY_FOR_JEV",
+        "provider": null,
+        "model": null,
+        "request_count": 1,
+        "question_count": 5,
+        "requests": [
+          {
+            "request_id": "opportunity-1",
+            "subject": {
+              "company": "Example Co",
+              "role": "Software Intern"
+            },
+            "state": {
+              "candidate": {
+                "approved_areas": [
+                  "backend-swe",
+                  "data-engineering"
+                ],
+                "demonstrated_strengths": [
+                  "Python APIs"
+                ],
+                "background_transition": "major",
+                "career_stage": "student",
+                "hard_constraints": {
+                  "needs_sponsorship": true
+                }
+              },
+              "opportunity": {
+                "company": "Example Co",
+                "role": "Software Intern",
+                "evidence_level": "EXACT_ROLE",
+                "evidence_summary": [
+                  {
+                    "scope": "exact_role",
+                    "field": "role",
+                    "status": "yes",
+                    "source_quality": "primary"
+                  }
+                ],
+                "material_unknowns": [],
+                "conversation_channel": "unavailable"
+              }
+            },
+            "questions": [
+              {
+                "name": "best_area",
+                "type": "choice",
+                "prompt": "Which approved target area best matches this opportunity?",
+                "options": [
+                  "backend-swe",
+                  "data-engineering",
+                  "other"
+                ]
+              },
+              {
+                "name": "role_fit",
+                "type": "score",
+                "prompt": "How strongly does this role fit the approved candidate profile?",
+                "minimum": 0,
+                "maximum": 4
+              },
+              {
+                "name": "evidence_strength",
+                "type": "score",
+                "prompt": "How strongly does the supplied evidence support the match?",
+                "minimum": 0,
+                "maximum": 4
+              },
+              {
+                "name": "background_pathway_accessible",
+                "type": "noul",
+                "prompt": "Is the candidate's background transition a plausible pathway into this role?"
+              },
+              {
+                "name": "sponsorship_evidence_supports_eligibility",
+                "type": "noul",
+                "prompt": "Does the evidence support sponsorship eligibility for this exact role?"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "jev-32-nontechnical-hybrid",
+      "description": "A hybrid candidate receives choices derived from approved product and analytics areas.",
+      "kind": "jev_plan",
+      "changes": {
+        "candidate_profile.target_areas": [
+          "product-analytics",
+          "solutions-engineering"
+        ],
+        "candidate_profile.background_transition": "adjacent"
+      },
+      "passed": true,
+      "details": [
+        "requests.0.questions.0.options contains 'product-analytics'; actual=['product-analytics', 'solutions-engineering', 'other']",
+        "requests.0.questions.0.options contains 'other'; actual=['product-analytics', 'solutions-engineering', 'other']"
+      ],
+      "actual": {
+        "state": "READY_FOR_JEV",
+        "provider": null,
+        "model": null,
+        "request_count": 1,
+        "question_count": 4,
+        "requests": [
+          {
+            "request_id": "opportunity-1",
+            "subject": {
+              "company": "Example Co",
+              "role": "Software Intern"
+            },
+            "state": {
+              "candidate": {
+                "approved_areas": [
+                  "product-analytics",
+                  "solutions-engineering"
+                ],
+                "demonstrated_strengths": [
+                  "Python APIs"
+                ],
+                "background_transition": "adjacent",
+                "career_stage": "student",
+                "hard_constraints": {
+                  "needs_sponsorship": false
+                }
+              },
+              "opportunity": {
+                "company": "Example Co",
+                "role": "Software Intern",
+                "evidence_level": "EXACT_ROLE",
+                "evidence_summary": [
+                  {
+                    "scope": "exact_role",
+                    "field": "role",
+                    "status": "yes",
+                    "source_quality": "primary"
+                  }
+                ],
+                "material_unknowns": [],
+                "conversation_channel": "unavailable"
+              }
+            },
+            "questions": [
+              {
+                "name": "best_area",
+                "type": "choice",
+                "prompt": "Which approved target area best matches this opportunity?",
+                "options": [
+                  "product-analytics",
+                  "solutions-engineering",
+                  "other"
+                ]
+              },
+              {
+                "name": "role_fit",
+                "type": "score",
+                "prompt": "How strongly does this role fit the approved candidate profile?",
+                "minimum": 0,
+                "maximum": 4
+              },
+              {
+                "name": "evidence_strength",
+                "type": "score",
+                "prompt": "How strongly does the supplied evidence support the match?",
+                "minimum": 0,
+                "maximum": 4
+              },
+              {
+                "name": "background_pathway_accessible",
+                "type": "noul",
+                "prompt": "Is the candidate's background transition a plausible pathway into this role?"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "jev-33-filtered-not-needed",
+      "description": "A deterministic hard stop consumes no Jev questions.",
+      "kind": "jev_plan",
+      "changes": {
+        "opportunities.0.prefilter_state": "BLOCKED"
+      },
+      "passed": true,
+      "details": [
+        "state == 'NOT_NEEDED'; actual='NOT_NEEDED'",
+        "question_count == 0; actual=0"
+      ],
+      "actual": {
+        "state": "NOT_NEEDED",
+        "provider": null,
+        "model": null,
+        "request_count": 0,
+        "question_count": 0,
+        "requests": []
+      }
+    },
+    {
+      "id": "jev-34-ready-no-client",
+      "description": "A surviving opportunity is ready for Jev without claiming provider connectivity.",
+      "kind": "jev_plan",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "state == 'READY_FOR_JEV'; actual='READY_FOR_JEV'",
+        "provider == None; actual=None",
+        "model == None; actual=None"
+      ],
+      "actual": {
+        "state": "READY_FOR_JEV",
+        "provider": null,
+        "model": null,
+        "request_count": 1,
+        "question_count": 3,
+        "requests": [
+          {
+            "request_id": "opportunity-1",
+            "subject": {
+              "company": "Example Co",
+              "role": "Software Intern"
+            },
+            "state": {
+              "candidate": {
+                "approved_areas": [
+                  "backend-swe",
+                  "data-engineering"
+                ],
+                "demonstrated_strengths": [
+                  "Python APIs"
+                ],
+                "background_transition": "none",
+                "career_stage": "student",
+                "hard_constraints": {
+                  "needs_sponsorship": false
+                }
+              },
+              "opportunity": {
+                "company": "Example Co",
+                "role": "Software Intern",
+                "evidence_level": "EXACT_ROLE",
+                "evidence_summary": [
+                  {
+                    "scope": "exact_role",
+                    "field": "role",
+                    "status": "yes",
+                    "source_quality": "primary"
+                  }
+                ],
+                "material_unknowns": [],
+                "conversation_channel": "unavailable"
+              }
+            },
+            "questions": [
+              {
+                "name": "best_area",
+                "type": "choice",
+                "prompt": "Which approved target area best matches this opportunity?",
+                "options": [
+                  "backend-swe",
+                  "data-engineering",
+                  "other"
+                ]
+              },
+              {
+                "name": "role_fit",
+                "type": "score",
+                "prompt": "How strongly does this role fit the approved candidate profile?",
+                "minimum": 0,
+                "maximum": 4
+              },
+              {
+                "name": "evidence_strength",
+                "type": "score",
+                "prompt": "How strongly does the supplied evidence support the match?",
+                "minimum": 0,
+                "maximum": 4
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "jev-validate-35-fixture",
+      "description": "A typed fixture stays labeled fixture.",
+      "kind": "jev_validate",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "provenance == 'fixture'; actual='fixture'"
+      ],
+      "actual": {
+        "request_hash": "1a978114dd3775103e9fa6cd0385e64cb3b3062e3302c674b91510dc9c58c37f",
+        "provenance": "fixture",
+        "answers": {
+          "best_area": {
+            "type": "choice",
+            "choice": "backend-swe",
+            "confidence": 0.9
+          }
+        },
+        "observed_at": null,
+        "cached_at": null,
+        "telemetry": {
+          "provider": null,
+          "model": null,
+          "request_count": 0,
+          "question_count": 1,
+          "latency_ms": 0,
+          "retry_count": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0
+        }
+      }
+    },
+    {
+      "id": "jev-validate-36-malformed",
+      "description": "A malformed answer type is rejected.",
+      "kind": "jev_validate",
+      "changes": {
+        "result.answers.best_area.type": "score"
+      },
+      "passed": true,
+      "details": [
+        "error=answers.best_area.type must be choice"
+      ],
+      "actual": {
+        "error": "answers.best_area.type must be choice"
+      }
+    },
+    {
+      "id": "jev-validate-37-stale-cache",
+      "description": "A stale cache cannot be used as a current judgment.",
+      "kind": "jev_validate",
+      "changes": {
+        "result.provenance": "cache",
+        "result.cached_at": "2000-01-01T00:00:00+00:00"
+      },
+      "passed": true,
+      "details": [
+        "error=cached Jev result is stale"
+      ],
+      "actual": {
+        "error": "cached Jev result is stale"
+      }
+    },
+    {
+      "id": "jev-validate-38-hash-mismatch",
+      "description": "A hash-mismatched cache is rejected.",
+      "kind": "jev_validate",
+      "changes": {
+        "result.request_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "passed": true,
+      "details": [
+        "error=result.request_hash does not match the normalized request"
+      ],
+      "actual": {
+        "error": "result.request_hash does not match the normalized request"
+      }
+    },
+    {
+      "id": "jev-validate-39-cache-hit",
+      "description": "A fresh matching cache preserves cache provenance.",
+      "kind": "jev_validate",
+      "changes": {
+        "result.provenance": "cache",
+        "result.cached_at": "__NOW__"
+      },
+      "passed": true,
+      "details": [
+        "provenance == 'cache'; actual='cache'"
+      ],
+      "actual": {
+        "request_hash": "1a978114dd3775103e9fa6cd0385e64cb3b3062e3302c674b91510dc9c58c37f",
+        "provenance": "cache",
+        "answers": {
+          "best_area": {
+            "type": "choice",
+            "choice": "backend-swe",
+            "confidence": 0.9
+          }
+        },
+        "observed_at": null,
+        "cached_at": "2026-09-26T01:13:25.033234+00:00",
+        "telemetry": {
+          "provider": null,
+          "model": null,
+          "request_count": 0,
+          "question_count": 1,
+          "latency_ms": 0,
+          "retry_count": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0
+        }
+      }
+    },
+    {
+      "id": "jev-validate-40-live-retry-telemetry",
+      "description": "Observed live telemetry preserves a bounded retry count.",
+      "kind": "jev_validate",
+      "changes": {
+        "result.provenance": "live",
+        "result.observed_at": "__NOW__",
+        "result.telemetry.provider": "typesafe",
+        "result.telemetry.model": "jev",
+        "result.telemetry.request_count": 1,
+        "result.telemetry.retry_count": 2
+      },
+      "passed": true,
+      "details": [
+        "provenance == 'live'; actual='live'",
+        "telemetry.retry_count == 2; actual=2"
+      ],
+      "actual": {
+        "request_hash": "1a978114dd3775103e9fa6cd0385e64cb3b3062e3302c674b91510dc9c58c37f",
+        "provenance": "live",
+        "answers": {
+          "best_area": {
+            "type": "choice",
+            "choice": "backend-swe",
+            "confidence": 0.9
+          }
+        },
+        "observed_at": "2026-09-26T01:13:25.033277+00:00",
+        "cached_at": null,
+        "telemetry": {
+          "provider": "typesafe",
+          "model": "jev",
+          "request_count": 1,
+          "question_count": 1,
+          "latency_ms": 0,
+          "retry_count": 2,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0
+        }
+      }
+    },
+    {
+      "id": "rank-41-fixed-session",
+      "description": "A verified fixed session keeps its exact interval.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.evidence.fixed_session": {
+          "start_minute": 30,
+          "end_minute": 45
+        }
+      },
+      "passed": true,
+      "details": [
+        "visit_schedule.0.fixed == True; actual=True",
+        "visit_schedule.0.start_minute == 30.0; actual=30.0"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "fixed": true,
+            "start_minute": 30.0,
+            "end_minute": 45.0
+          }
+        ],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "fixed_session": {
+                "start_minute": 30,
+                "end_minute": 45
+              }
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "MUST_VISIT",
+            "assigned_session": {
+              "start_minute": 30.0,
+              "end_minute": 45.0
+            },
+            "route_action": "VISIT",
+            "route_exclusion_reason": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-42-flexible-session",
+      "description": "A verified flexible booth can receive a generated interval.",
+      "kind": "rank",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "visit_schedule.0.fixed == False; actual=False",
+        "opportunities.0.route_action == 'VISIT'; actual='VISIT'"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "fixed": false,
+            "start_minute": 0.0,
+            "end_minute": 15.0
+          }
+        ],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified"
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "MUST_VISIT",
+            "assigned_session": {
+              "start_minute": 0.0,
+              "end_minute": 15.0
+            },
+            "route_action": "VISIT",
+            "route_exclusion_reason": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-43-unknown-session",
+      "description": "Unknown access creates CHECK_SESSION and no route.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.evidence.visit_access": "unknown",
+        "opportunities.0.evidence.session_status": "unknown"
+      },
+      "passed": true,
+      "details": [
+        "visit_schedule == []; actual=[]",
+        "opportunities.0.route_action == 'CHECK_SESSION'; actual='CHECK_SESSION'"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [
+              "session_status",
+              "visit_access"
+            ],
+            "reasons": [],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "unknown",
+              "visit_access": "unknown"
+            },
+            "visit_access_confidence": 0.2,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "IF_TIME",
+            "route_action": "CHECK_SESSION",
+            "route_exclusion_reason": "visit_access_unknown"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-44-low-access-confidence",
+      "description": "Verified-looking access below the confidence gate cannot be scheduled.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.visit_access_confidence": 0.79
+      },
+      "passed": true,
+      "details": [
+        "visit_schedule == []; actual=[]",
+        "opportunities.0.route_exclusion_reason == 'visit_access_confidence_below_0.80'; actual='visit_access_confidence_below_0.80'"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified"
+            },
+            "visit_access_confidence": 0.79,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "IF_TIME",
+            "route_action": "CHECK_SESSION",
+            "route_exclusion_reason": "visit_access_confidence_below_0.80"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-45-session-conflict",
+      "description": "Overlapping fixed sessions keep only the higher-value visit.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.evidence.fixed_session": {
+          "start_minute": 15,
+          "end_minute": 30
+        },
+        "opportunities.1": {
+          "company": "Lower Value Co",
+          "role": "Software Intern",
+          "user_interest": 0.8,
+          "evidence": {
+            "session_status": "verified",
+            "visit_access": "verified",
+            "fixed_session": {
+              "start_minute": 20,
+              "end_minute": 35
+            }
+          },
+          "judgments": {
+            "role_fit": {
+              "type": "score",
+              "score": 3,
+              "confidence": 0.9
+            },
+            "evidence_strength": {
+              "type": "score",
+              "score": 3,
+              "confidence": 0.9
+            },
+            "conversation_leverage": {
+              "type": "score",
+              "score": 3,
+              "confidence": 0.9
+            },
+            "information_gain": {
+              "type": "score",
+              "score": 2,
+              "confidence": 0.9
+            },
+            "best_area": {
+              "type": "choice",
+              "choice": "backend-swe",
+              "confidence": 0.9
+            }
+          }
+        }
+      },
+      "passed": true,
+      "details": [
+        "visit_schedule.0.company == 'Example Co'; actual='Example Co'",
+        "opportunities.1.review_flags contains 'schedule_conflict'; actual=['schedule_conflict']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "fixed": true,
+            "start_minute": 15.0,
+            "end_minute": 30.0
+          }
+        ],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "fixed_session": {
+                "start_minute": 15,
+                "end_minute": 30
+              }
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "MUST_VISIT",
+            "assigned_session": {
+              "start_minute": 15.0,
+              "end_minute": 30.0
+            },
+            "route_action": "VISIT",
+            "route_exclusion_reason": null
+          },
+          {
+            "company": "Lower Value Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 72.0,
+            "normalized_dimensions": {
+              "role_fit": 0.75,
+              "evidence_strength": 0.75,
+              "conversation_leverage": 0.75,
+              "information_gain": 0.5,
+              "user_interest": 0.8
+            },
+            "review_flags": [
+              "schedule_conflict"
+            ],
+            "reasons": [],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "fixed_session": {
+                "start_minute": 20,
+                "end_minute": 35
+              }
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "APPLY_ONLINE",
+            "route_action": "APPLY_ONLINE",
+            "route_exclusion_reason": "schedule_conflict"
+          }
+        ]
+      }
+    },
+    {
+      "id": "intake-46-unresolved-sponsorship",
+      "description": "Unresolved sponsorship need stops before ranking.",
+      "kind": "intake",
+      "changes": {
+        "candidate_profile.needs_sponsorship": null
+      },
+      "passed": true,
+      "details": [
+        "decision_state == 'STOP'; actual='STOP'"
+      ],
+      "actual": {
+        "missing_fields": [
+          "candidate_profile.needs_sponsorship"
+        ],
+        "forbidden_actions": [
+          "Request or store passwords",
+          "Handle MFA codes or solve CAPTCHAs",
+          "Bypass authentication or use hidden private endpoints",
+          "Register, waitlist, message, apply, upload, or mutate a profile without confirmation"
+        ],
+        "external_mutations_require_confirmation": true,
+        "state": "PROFILE_REVIEW",
+        "decision_state": "STOP",
+        "permitted_actions": [
+          "Draft or revise the candidate profile"
+        ],
+        "next_actions": [
+          "Ask the user to correct and explicitly approve the profile."
+        ]
+      }
+    },
+    {
+      "id": "rank-47-location-hard-mismatch",
+      "description": "A verified location hard mismatch filters before Jev.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.evidence.explicit_disqualifiers": [
+          "location"
+        ]
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.reasons contains 'location'; actual=['location']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 15.0,
+            "normalized_dimensions": {
+              "role_fit": 0.0,
+              "evidence_strength": 0.0,
+              "conversation_leverage": 0.0,
+              "information_gain": 0.0,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [
+              "location"
+            ],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "explicit_disqualifiers": [
+                "location"
+              ]
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "BLOCKED",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "SKIP",
+            "route_action": "SKIP",
+            "route_exclusion_reason": "location"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-48-clearance-citizenship",
+      "description": "A verified clearance or citizenship mismatch filters before Jev.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.evidence.explicit_disqualifiers": [
+          "clearance"
+        ]
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.reasons contains 'clearance'; actual=['clearance']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 15.0,
+            "normalized_dimensions": {
+              "role_fit": 0.0,
+              "evidence_strength": 0.0,
+              "conversation_leverage": 0.0,
+              "information_gain": 0.0,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [
+              "clearance"
+            ],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "explicit_disqualifiers": [
+                "clearance"
+              ]
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "BLOCKED",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "SKIP",
+            "route_action": "SKIP",
+            "route_exclusion_reason": "clearance"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-49-experience-gap",
+      "description": "A verified minimum-experience gap filters before Jev.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.evidence.explicit_disqualifiers": [
+          "minimum_experience"
+        ]
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.reasons contains 'minimum_experience'; actual=['minimum_experience']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 15.0,
+            "normalized_dimensions": {
+              "role_fit": 0.0,
+              "evidence_strength": 0.0,
+              "conversation_leverage": 0.0,
+              "information_gain": 0.0,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [
+              "minimum_experience"
+            ],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified",
+              "explicit_disqualifiers": [
+                "minimum_experience"
+              ]
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "BLOCKED",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "SKIP",
+            "route_action": "SKIP",
+            "route_exclusion_reason": "minimum_experience"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-50-explicit-avoid",
+      "description": "An explicit user avoid area is a deterministic opt-out.",
+      "kind": "rank",
+      "changes": {
+        "opportunities.0.user_interest": 0
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.reasons contains 'user_opt_out'; actual=['user_opt_out']"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 0.0,
+            "normalized_dimensions": {
+              "role_fit": 0.0,
+              "evidence_strength": 0.0,
+              "conversation_leverage": 0.0,
+              "information_gain": 0.0,
+              "user_interest": 0.0
+            },
+            "review_flags": [],
+            "reasons": [
+              "user_opt_out"
+            ],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified"
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "BLOCKED",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "SKIP",
+            "route_action": "SKIP",
+            "route_exclusion_reason": "user_opt_out"
+          }
+        ]
+      }
+    },
+    {
+      "id": "rank-51-soft-salary",
+      "description": "A soft salary preference does not create a hard rejection.",
+      "kind": "rank",
+      "changes": {
+        "candidate_profile.salary": {
+          "minimum": 100000,
+          "currency": "USD",
+          "hard_constraint": false
+        }
+      },
+      "passed": true,
+      "details": [
+        "opportunities.0.tier == 'MUST_VISIT'; actual='MUST_VISIT'"
+      ],
+      "actual": {
+        "capacity": {
+          "total_visits": 10,
+          "must_visit_limit": 7,
+          "duration_minutes": 180.0,
+          "reserve_minutes": 30.0,
+          "minutes_per_visit": 15.0
+        },
+        "weights": {
+          "role_fit": 0.3,
+          "evidence_strength": 0.15,
+          "conversation_leverage": 0.25,
+          "information_gain": 0.15,
+          "user_interest": 0.15
+        },
+        "visit_schedule": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "fixed": false,
+            "start_minute": 0.0,
+            "end_minute": 15.0
+          }
+        ],
+        "external_actions_require_confirmation": true,
+        "opportunities": [
+          {
+            "company": "Example Co",
+            "role": "Software Intern",
+            "best_area": "backend-swe",
+            "visit_score": 96.2,
+            "normalized_dimensions": {
+              "role_fit": 1.0,
+              "evidence_strength": 1.0,
+              "conversation_leverage": 1.0,
+              "information_gain": 0.75,
+              "user_interest": 1.0
+            },
+            "review_flags": [],
+            "reasons": [],
+            "evidence_ids": [],
+            "evidence_records": [],
+            "evidence": {
+              "session_status": "verified",
+              "visit_access": "verified"
+            },
+            "visit_access_confidence": 0.9,
+            "prefilter_state": "SURVIVES",
+            "jev_required": false,
+            "decision_state": "FULL",
+            "preliminary_priority": null,
+            "tier": "MUST_VISIT",
+            "assigned_session": {
+              "start_minute": 0.0,
+              "end_minute": 15.0
+            },
+            "route_action": "VISIT",
+            "route_exclusion_reason": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "regression-52-domestic-public-preview",
+      "description": "Replay the prior domestic no-registration input.",
+      "kind": "regression",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "decision_state == 'PARTIAL'; actual='PARTIAL'",
+        "visit_schedule == []; actual=[]",
+        "coverage_complete == False; actual=False"
+      ],
+      "actual": {
+        "decision_state": "PARTIAL",
+        "visit_schedule": [],
+        "coverage_complete": false,
+        "sponsorship_scopes": [
+          "employer_event_card"
+        ]
+      }
+    },
+    {
+      "id": "regression-53-sponsor-public-preview",
+      "description": "Replay the prior sponsor-needed no-registration input.",
+      "kind": "regression",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "decision_state == 'PARTIAL'; actual='PARTIAL'",
+        "sponsorship_scopes contains 'employer_event_card'; actual=['employer_event_card']"
+      ],
+      "actual": {
+        "decision_state": "PARTIAL",
+        "visit_schedule": [],
+        "coverage_complete": false,
+        "sponsorship_scopes": [
+          "employer_event_card"
+        ]
+      }
+    },
+    {
+      "id": "regression-54-high-evidence",
+      "description": "Replay the prior high-evidence input and schedule only verified access.",
+      "kind": "regression",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "decision_state == 'FULL'; actual='FULL'",
+        "scheduled_companies contains 'Synthetic Atlas Systems'; actual=['Synthetic Atlas Systems']",
+        "unscheduled_companies contains 'Synthetic Nimbus Analytics'; actual=['Synthetic Nimbus Analytics']"
+      ],
+      "actual": {
+        "decision_state": "FULL",
+        "scheduled_companies": [
+          "Synthetic Atlas Systems"
+        ],
+        "unscheduled_companies": [
+          "Synthetic Nimbus Analytics"
+        ]
+      }
+    },
+    {
+      "id": "regression-55-transition-sponsor",
+      "description": "Replay the prior transition-and-sponsorship input.",
+      "kind": "regression",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "requests.0.questions.5.name == 'background_pathway_accessible'; actual='background_pathway_accessible'",
+        "requests.0.questions.6.name == 'sponsorship_evidence_supports_eligibility'; actual='sponsorship_evidence_supports_eligibility'"
+      ],
+      "actual": {
+        "state": "READY_FOR_JEV",
+        "provider": null,
+        "model": null,
+        "request_count": 1,
+        "question_count": 7,
+        "requests": [
+          {
+            "request_id": "opportunity-1",
+            "subject": {
+              "company": "Synthetic Health Data Lab",
+              "role": "Applied ML Intern"
+            },
+            "state": {
+              "candidate": {
+                "approved_areas": [
+                  "applied-ml",
+                  "data-engineering",
+                  "backend-swe"
+                ],
+                "demonstrated_strengths": [],
+                "background_transition": "major",
+                "career_stage": "unknown",
+                "hard_constraints": {
+                  "needs_sponsorship": true
+                }
+              },
+              "opportunity": {
+                "company": "Synthetic Health Data Lab",
+                "role": "Applied ML Intern",
+                "evidence_level": "EXACT_ROLE",
+                "evidence_summary": [],
+                "material_unknowns": [
+                  "sponsorship",
+                  "entry_level_access"
+                ],
+                "conversation_channel": "plausible"
+              }
+            },
+            "questions": [
+              {
+                "name": "best_area",
+                "type": "choice",
+                "prompt": "Which approved target area best matches this opportunity?",
+                "options": [
+                  "applied-ml",
+                  "data-engineering",
+                  "backend-swe",
+                  "other"
+                ]
+              },
+              {
+                "name": "role_fit",
+                "type": "score",
+                "prompt": "How strongly does this role fit the approved candidate profile?",
+                "minimum": 0,
+                "maximum": 4
+              },
+              {
+                "name": "conversation_leverage",
+                "type": "score",
+                "prompt": "How much can a fair conversation improve this candidate's outcome?",
+                "minimum": 0,
+                "maximum": 4
+              },
+              {
+                "name": "information_gain",
+                "type": "score",
+                "prompt": "How much useful uncertainty could this interaction resolve?",
+                "minimum": 0,
+                "maximum": 4
+              },
+              {
+                "name": "entry_level_accessible",
+                "type": "noul",
+                "prompt": "Is this opportunity realistically accessible at the candidate's career stage?"
+              },
+              {
+                "name": "background_pathway_accessible",
+                "type": "noul",
+                "prompt": "Is the candidate's background transition a plausible pathway into this role?"
+              },
+              {
+                "name": "sponsorship_evidence_supports_eligibility",
+                "type": "noul",
+                "prompt": "Does the evidence support sponsorship eligibility for this exact role?"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "regression-56-sparse-ambiguous",
+      "description": "Replay the prior sparse ambiguous input without fabricating FULL.",
+      "kind": "regression",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "decision_state == 'STOP'; actual='STOP'"
+      ],
+      "actual": {
+        "decision_state": "STOP",
+        "evidence_confidence": 0.0,
+        "match_confidence": 0.0,
+        "visit_access_confidence": 0.0,
+        "decision_confidence": 0.0,
+        "route_ready": false,
+        "confidence_caps": [],
+        "review_flags": [
+          "candidate_profile_not_approved"
+        ]
+      }
+    },
+    {
+      "id": "regression-57-jev-baseline",
+      "description": "Replay the prior Jev fixture without claiming a live call.",
+      "kind": "regression",
+      "changes": {},
+      "passed": true,
+      "details": [
+        "provenance == 'fixture'; actual='fixture'",
+        "telemetry.provider == None; actual=None"
+      ],
+      "actual": {
+        "request_hash": "b8a529248520ca9171bd7605aea05588a4291330f51eae50512cee8cffeab121",
+        "provenance": "fixture",
+        "answers": {
+          "best_area": {
+            "type": "choice",
+            "choice": "backend-swe",
+            "confidence": 0.9
+          },
+          "role_fit": {
+            "type": "score",
+            "score": 3.5,
+            "confidence": 0.85
+          }
+        },
+        "observed_at": null,
+        "cached_at": null,
+        "telemetry": {
+          "provider": null,
+          "model": null,
+          "request_count": 0,
+          "question_count": 2,
+          "latency_ms": 0,
+          "retry_count": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0
+        }
       }
     }
   ]

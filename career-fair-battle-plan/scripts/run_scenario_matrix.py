@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+from datetime import datetime, timezone
 import importlib.util
 import json
 import sys
@@ -13,6 +14,7 @@ from typing import Any
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[1]
 
 
 def _load_module(name: str, path: Path):
@@ -97,6 +99,157 @@ def _base_rank() -> dict[str, Any]:
     }
 
 
+def _base_normalize() -> dict[str, Any]:
+    return {
+        "adapter": "handshake_public_preview",
+        "accessed_at": "2026-09-25",
+        "source_url": "https://fixtures.invalid/fair-preview",
+        "advertised_employer_count": 2,
+        "employers": [
+            {
+                "name": "Example Co",
+                "job_titles": ["Software Intern"],
+                "work_authorization_text": "Employer is willing to sponsor candidates",
+                "session_count": 1,
+            }
+        ],
+    }
+
+
+def _base_jev_plan() -> dict[str, Any]:
+    return {
+        "candidate_profile": {
+            "approved": True,
+            "needs_sponsorship": False,
+            "background_transition": "none",
+            "target_areas": ["backend-swe", "data-engineering"],
+            "demonstrated_strengths": ["Python APIs"],
+            "career_stage": "student",
+            "hard_constraints": {},
+        },
+        "opportunities": [
+            {
+                "company": "Example Co",
+                "role": "Software Intern",
+                "prefilter_state": "SURVIVES",
+                "evidence_level": "EXACT_ROLE",
+                "evidence_records": [
+                    {
+                        "scope": "exact_role",
+                        "field": "role",
+                        "status": "yes",
+                        "source_quality": "primary",
+                    }
+                ],
+                "career_stage_clear": True,
+                "material_unknowns": [],
+                "conversation_channel": "unavailable",
+                "exact_role_sponsorship": "not_needed",
+            }
+        ],
+    }
+
+
+def _base_jev_validate(validator: Any) -> dict[str, Any]:
+    request = {
+        "state": {"candidate": {"approved_areas": ["backend-swe"]}},
+        "questions": [
+            {
+                "name": "best_area",
+                "type": "choice",
+                "options": ["backend-swe", "other"],
+            }
+        ],
+    }
+    return {
+        "request": request,
+        "result": {
+            "request_hash": validator.compute_request_hash(request),
+            "provenance": "fixture",
+            "answers": {
+                "best_area": {
+                    "type": "choice",
+                    "choice": "backend-swe",
+                    "confidence": 0.9,
+                }
+            },
+            "observed_at": None,
+            "cached_at": None,
+            "telemetry": {
+                "provider": None,
+                "model": None,
+                "request_count": 0,
+                "question_count": 1,
+                "latency_ms": 0,
+                "retry_count": 0,
+                "input_tokens": 0,
+                "output_tokens": 0,
+                "cost_usd": 0,
+            },
+        },
+    }
+
+
+def _run_regression_fixture(
+    payload: dict[str, Any], modules: dict[str, Any]
+) -> dict[str, Any]:
+    case_id = payload.get("case_id")
+    if case_id in {"domestic-public-preview", "sponsor-public-preview"}:
+        normalized = modules["normalize"].normalize_source(payload["source"])
+        sponsor_scopes = sorted(
+            {
+                record["scope"]
+                for record in normalized["evidence_records"]
+                if record["field"] == "sponsorship"
+            }
+        )
+        return {
+            "decision_state": "PARTIAL",
+            "visit_schedule": [],
+            "coverage_complete": normalized["coverage"]["complete"],
+            "sponsorship_scopes": sponsor_scopes,
+        }
+    if case_id == "high-evidence":
+        rank_input = {
+            "candidate_profile": {
+                **payload["candidate_profile"],
+                "salary": {"minimum": None, "currency": "USD", "hard_constraint": False},
+                "headcount_importance": "medium",
+            },
+            "fair": payload["fair"],
+            "opportunities": payload["opportunities"],
+            "evidence_records": [],
+        }
+        plan = modules["rank"].build_battle_plan(rank_input)
+        return {
+            "decision_state": "FULL",
+            "scheduled_companies": [item["company"] for item in plan["visit_schedule"]],
+            "unscheduled_companies": [
+                item["company"]
+                for item in plan["opportunities"]
+                if item["route_action"] != "VISIT"
+            ],
+        }
+    if case_id == "transition-sponsor":
+        return modules["jev_plan"].build_jev_plan(
+            {
+                "candidate_profile": payload["candidate_profile"],
+                "opportunities": payload["opportunities"],
+            }
+        )
+    if case_id == "sparse-ambiguous":
+        return modules["readiness"].build_decision_readiness(
+            {"evidence_level": "EMPLOYER_NAME", "visit_access": "unknown"},
+            payload["candidate_profile"],
+        )
+    if case_id == "jev-baseline":
+        request = payload["request"]
+        result = copy.deepcopy(payload["result"])
+        result["request_hash"] = modules["jev_validate"].compute_request_hash(request)
+        return modules["jev_validate"].validate_jev_result(request, result)
+    raise ValueError(f"unsupported regression fixture: {case_id}")
+
+
 def _set_path(document: Any, path: str, value: Any) -> None:
     parts = path.split(".")
     target = document
@@ -104,9 +257,23 @@ def _set_path(document: Any, path: str, value: Any) -> None:
         target = target[int(part)] if isinstance(target, list) else target[part]
     last = parts[-1]
     if isinstance(target, list):
-        target[int(last)] = value
+        index = int(last)
+        if index == len(target):
+            target.append(value)
+        else:
+            target[index] = value
     else:
         target[last] = value
+
+
+def _replace_sentinels(value: Any) -> Any:
+    if value == "__NOW__":
+        return datetime.now(timezone.utc).isoformat()
+    if isinstance(value, list):
+        return [_replace_sentinels(item) for item in value]
+    if isinstance(value, dict):
+        return {key: _replace_sentinels(item) for key, item in value.items()}
+    return value
 
 
 def _get_path(document: Any, path: str) -> Any:
@@ -134,20 +301,56 @@ def run_matrix(path: Path) -> dict[str, Any]:
     if not isinstance(scenarios, list):
         raise ValueError("scenarios must be a list")
     intake = _load_module("matrix_assess_intake", SCRIPT_DIR / "assess_intake.py")
+    normalizer = _load_module("matrix_normalize_source", SCRIPT_DIR / "normalize_source.py")
+    planner = _load_module("matrix_plan_jev", SCRIPT_DIR / "plan_jev_requests.py")
+    validator = _load_module("matrix_validate_jev", SCRIPT_DIR / "validate_jev_results.py")
+    readiness = _load_module("matrix_readiness", SCRIPT_DIR / "decision_readiness.py")
     ranker = _load_module("matrix_rank_battle_plan", SCRIPT_DIR / "rank_battle_plan.py")
+    modules = {
+        "intake": intake,
+        "normalize": normalizer,
+        "jev_plan": planner,
+        "jev_validate": validator,
+        "readiness": readiness,
+        "rank": ranker,
+    }
+    runners = {
+        "intake": lambda payload: intake.assess_intake(payload),
+        "normalize": lambda payload: normalizer.normalize_source(payload),
+        "jev_plan": lambda payload: planner.build_jev_plan(payload),
+        "jev_validate": lambda payload: validator.validate_jev_result(
+            payload["request"], payload["result"]
+        ),
+        "rank": lambda payload: ranker.build_battle_plan(payload),
+        "regression": lambda payload: _run_regression_fixture(payload, modules),
+    }
+    base_factories = {
+        "intake": _base_intake,
+        "normalize": _base_normalize,
+        "jev_plan": _base_jev_plan,
+        "jev_validate": lambda: _base_jev_validate(validator),
+        "rank": _base_rank,
+    }
     results: list[dict[str, Any]] = []
 
     for scenario in scenarios:
         kind = scenario.get("kind")
-        payload = copy.deepcopy(_base_intake() if kind == "intake" else _base_rank())
+        if kind not in runners:
+            raise ValueError(f"unsupported scenario kind: {kind}")
+        if "fixture" in scenario:
+            fixture_path = REPO_ROOT / scenario["fixture"]
+            payload = json.loads(fixture_path.read_text(encoding="utf-8"))
+        elif "payload" in scenario:
+            payload = copy.deepcopy(scenario["payload"])
+        elif kind in base_factories:
+            payload = copy.deepcopy(base_factories[kind]())
+        else:
+            raise ValueError(f"scenario {scenario.get('id')} requires fixture or payload")
         for field, value in scenario.get("changes", {}).items():
             _set_path(payload, field, value)
+        payload = _replace_sentinels(payload)
         try:
-            actual = (
-                intake.assess_intake(payload)
-                if kind == "intake"
-                else ranker.build_battle_plan(payload)
-            )
+            actual = runners[kind](payload)
             if "expected_error" in scenario:
                 passed = False
                 details = ["expected an error but execution succeeded"]

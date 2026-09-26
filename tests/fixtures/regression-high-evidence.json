@@ -12,23 +12,48 @@
     "target_areas": ["backend-swe", "data-engineering"],
     "needs_sponsorship": false
   },
+  "fair": {
+    "duration_minutes": 90,
+    "reserve_minutes": 15,
+    "minutes_per_visit": 15
+  },
   "opportunities": [
     {
       "company": "Synthetic Atlas Systems",
       "role": "Backend Engineering Intern",
       "evidence_level": "SESSION_VERIFIED",
-      "visit_access": "verified",
-      "session_status": "verified",
-      "fixed_session": {"start_minute": 30, "end_minute": 45},
-      "judgment_provenance": "fixture"
+      "user_interest": 1.0,
+      "evidence": {
+        "visit_access": "verified",
+        "session_status": "verified",
+        "fixed_session": {"start_minute": 30, "end_minute": 45}
+      },
+      "judgment_provenance": "fixture",
+      "judgments": {
+        "role_fit": {"type": "score", "score": 4, "confidence": 0.92},
+        "evidence_strength": {"type": "score", "score": 4, "confidence": 0.9},
+        "conversation_leverage": {"type": "score", "score": 4, "confidence": 0.88},
+        "information_gain": {"type": "score", "score": 2, "confidence": 0.82},
+        "best_area": {"type": "choice", "choice": "backend-swe", "confidence": 0.94}
+      }
     },
     {
       "company": "Synthetic Nimbus Analytics",
       "role": "Data Engineering Intern",
       "evidence_level": "EXACT_ROLE",
-      "visit_access": "unknown",
-      "session_status": "unknown",
-      "judgment_provenance": "fixture"
+      "user_interest": 0.9,
+      "evidence": {
+        "visit_access": "unknown",
+        "session_status": "unknown"
+      },
+      "judgment_provenance": "fixture",
+      "judgments": {
+        "role_fit": {"type": "score", "score": 3.5, "confidence": 0.86},
+        "evidence_strength": {"type": "score", "score": 3.5, "confidence": 0.84},
+        "conversation_leverage": {"type": "score", "score": 3.5, "confidence": 0.8},
+        "information_gain": {"type": "score", "score": 4, "confidence": 0.9},
+        "best_area": {"type": "choice", "choice": "data-engineering", "confidence": 0.9}
+      }
     }
   ],
   "expected": {

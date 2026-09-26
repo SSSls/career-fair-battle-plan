@@ -4,6 +4,7 @@
       "id": "intake-01-unapproved",
       "description": "Traditional CS profile still needs explicit approval.",
       "kind": "intake",
+      "dimensions": ["candidate:conventional-cs"],
       "changes": {"candidate_profile.approved": false},
       "checks": [{"path": "state", "equals": "PROFILE_REVIEW"}]
     },
@@ -21,6 +22,7 @@
       "id": "intake-03-no-target-area",
       "description": "An undecided candidate must approve at least one generated target area.",
       "kind": "intake",
+      "dimensions": ["candidate:sparse"],
       "changes": {"candidate_profile.target_areas": []},
       "checks": [{"path": "state", "equals": "PROFILE_REVIEW"}]
     },
@@ -28,6 +30,7 @@
       "id": "intake-04-no-fair-source",
       "description": "A complete profile but no fair data asks for one supported source.",
       "kind": "intake",
+      "dimensions": ["source:none"],
       "changes": {"fair.source_mode": null},
       "checks": [{"path": "state", "equals": "NEED_FAIR_SOURCE"}]
     },
@@ -35,6 +38,7 @@
       "id": "intake-05-switcher-upload",
       "description": "A career switcher with a supplied export can proceed read-only.",
       "kind": "intake",
+      "dimensions": ["source:upload"],
       "changes": {
         "candidate_profile.background_type": "career_switcher",
         "candidate_profile.school": "Regional University",
@@ -57,6 +61,7 @@
       "id": "intake-07-adjacent-public",
       "description": "An adjacent-field candidate can use a public event page.",
       "kind": "intake",
+      "dimensions": ["candidate:adjacent-transition", "candidate:user-pivot", "source:public-web"],
       "changes": {
         "candidate_profile.background_type": "adjacent_field",
         "candidate_profile.target_areas": ["quant-developer", "backend-swe"],
@@ -113,6 +118,7 @@
       "id": "rank-13-exact-no-sponsor",
       "description": "An exact-role no-sponsorship statement is a hard stop when sponsorship is needed.",
       "kind": "rank",
+      "dimensions": ["policy:future-sponsorship"],
       "changes": {
         "candidate_profile.needs_sponsorship": true,
         "opportunities.0.evidence.sponsorship": {"status": "no", "scope": "exact_role", "evidence_id": "sponsor-exact-no"}
@@ -139,6 +145,7 @@
       "id": "rank-15-salary-hard-fail",
       "description": "An official exact-role maximum below a hard salary floor causes SKIP.",
       "kind": "rank",
+      "dimensions": ["policy:salary-hard"],
       "changes": {
         "candidate_profile.salary": {"minimum": 100000, "currency": "USD", "hard_constraint": true},
         "opportunities.0.evidence.salary": {"min": 70000, "max": 90000, "currency": "USD", "source_type": "official_exact_role", "evidence_id": "salary-official"}
@@ -159,6 +166,7 @@
       "id": "rank-17-headcount-confirmed",
       "description": "Confirmed active headcount supports MUST_VISIT when headcount matters highly.",
       "kind": "rank",
+      "dimensions": ["policy:domestic"],
       "changes": {
         "candidate_profile.headcount_importance": "high",
         "opportunities.0.evidence.headcount": {"status": "confirmed", "evidence_id": "hc-confirmed"}
@@ -182,6 +190,7 @@
       "id": "rank-19-no-visit-channel",
       "description": "A full session with no booth or group alternative routes to APPLY_ONLINE.",
       "kind": "rank",
+      "dimensions": ["session:full", "session:unavailable"],
       "changes": {
         "opportunities.0.evidence.session_status": "full",
         "opportunities.0.evidence.visit_access": "unavailable"
@@ -202,6 +211,7 @@
       "id": "intake-21-handshake-public-preview",
       "description": "A visible Handshake public preview is ingestible without login or registration.",
       "kind": "intake",
+      "dimensions": ["source:public-preview"],
       "changes": {
         "fair.platform": "handshake",
         "fair.source_mode": "PUBLIC_PREVIEW",
@@ -219,6 +229,7 @@
       "id": "intake-22-handshake-read-only-ready",
       "description": "Authenticated Handshake read-only access remains independent from event registration.",
       "kind": "intake",
+      "dimensions": ["source:authenticated-not-registered"],
       "changes": {
         "fair.platform": "handshake",
         "fair.source_mode": "AUTHENTICATED_READ_ONLY",
@@ -230,6 +241,436 @@
         {"path": "state", "equals": "READY_FOR_INGESTION"},
         {"path": "source_mode", "equals": "AUTHENTICATED_READ_ONLY"},
         {"path": "access_state.registration_state", "equals": "NOT_REGISTERED"}
+      ]
+    },
+    {
+      "id": "intake-23-registered-read-only",
+      "description": "Registration and read-only authorization can both be visible without granting mutation permission.",
+      "kind": "intake",
+      "dimensions": ["source:registered-read-only"],
+      "changes": {
+        "fair.source_mode": "AUTHENTICATED_READ_ONLY",
+        "access.authentication_state": "LOGGED_IN",
+        "access.registration_state": "REGISTERED",
+        "access.authorization_scope": "READ_ONLY",
+        "access.mutation_allowed": false
+      },
+      "checks": [
+        {"path": "state", "equals": "READY_FOR_INGESTION"},
+        {"path": "access_state.mutation_allowed", "equals": false}
+      ]
+    },
+    {
+      "id": "intake-24-temporary-authorization",
+      "description": "Temporary work authorization is recorded as user input rather than inferred.",
+      "kind": "intake",
+      "dimensions": ["policy:temporary-authorization"],
+      "changes": {
+        "candidate_profile.work_authorization": "temporary student work authorization",
+        "candidate_profile.needs_sponsorship": true
+      },
+      "checks": [{"path": "state", "equals": "READY_FOR_INGESTION"}]
+    },
+    {
+      "id": "normalize-25-partial-six-of-eleven",
+      "description": "A six-card public preview never claims complete eleven-employer coverage.",
+      "kind": "normalize",
+      "dimensions": ["source:partial-6-of-11"],
+      "payload": {
+        "adapter": "handshake_public_preview",
+        "accessed_at": "2026-09-25",
+        "source_url": "https://fixtures.invalid/partial-preview",
+        "advertised_employer_count": 11,
+        "employers": [
+          {"name": "Employer 1", "job_titles": [], "session_count": 0},
+          {"name": "Employer 2", "job_titles": [], "session_count": 0},
+          {"name": "Employer 3", "job_titles": [], "session_count": 0},
+          {"name": "Employer 4", "job_titles": [], "session_count": 0},
+          {"name": "Employer 5", "job_titles": [], "session_count": 0},
+          {"name": "Employer 6", "job_titles": [], "session_count": 0}
+        ]
+      },
+      "checks": [
+        {"path": "coverage.visible", "equals": 6},
+        {"path": "coverage.advertised", "equals": 11},
+        {"path": "coverage.complete", "equals": false}
+      ]
+    },
+    {
+      "id": "normalize-26-official-incomplete",
+      "description": "Featured employers on an official school page remain an incomplete list.",
+      "kind": "normalize",
+      "dimensions": ["source:official-incomplete"],
+      "payload": {
+        "adapter": "official_school",
+        "accessed_at": "2026-09-25",
+        "source_url": "https://fixtures.invalid/official-partial",
+        "fair": {"name": "Engineering Fair", "date": "2026-10-02"},
+        "advertised_employer_count": 40,
+        "employer_list_kind": "featured_only",
+        "employers": [{"name": "Featured Employer"}]
+      },
+      "checks": [{"path": "coverage.complete", "equals": false}]
+    },
+    {
+      "id": "normalize-27-login-wall",
+      "description": "An official login wall reports the access boundary without inventing employers.",
+      "kind": "normalize",
+      "dimensions": ["source:login-wall"],
+      "payload": {
+        "adapter": "official_school",
+        "accessed_at": "2026-09-25",
+        "source_url": "https://fixtures.invalid/login-wall",
+        "fair": {"name": "Technical Fair", "date": "2026-10-10"},
+        "login_required_for_employer_list": true,
+        "employers": []
+      },
+      "checks": [
+        {"path": "access_requirements", "contains": "login_required_for_employer_list"},
+        {"path": "leads", "equals": []}
+      ]
+    },
+    {
+      "id": "normalize-28-stale-history",
+      "description": "Historical sponsorship remains stale company history.",
+      "kind": "normalize",
+      "dimensions": ["source:stale"],
+      "payload": {
+        "adapter": "external_role_research",
+        "accessed_at": "2026-09-25",
+        "source_url": "https://fixtures.invalid/history",
+        "roles": [{
+          "source_id": "history-1",
+          "company": "Historical Employer",
+          "role": null,
+          "sponsorship": "yes",
+          "scope": "company_history",
+          "published_at": "2024-09-01",
+          "freshness": "stale"
+        }]
+      },
+      "checks": [
+        {"path": "evidence_records.0.scope", "equals": "company_history"},
+        {"path": "evidence_records.0.freshness", "equals": "stale"}
+      ]
+    },
+    {
+      "id": "rank-29-conflicting-sponsor-scopes",
+      "description": "Conflicting company history and exact negative evidence use the exact-role hard fact.",
+      "kind": "rank",
+      "dimensions": ["source:conflicting"],
+      "changes": {
+        "candidate_profile.needs_sponsorship": true,
+        "opportunities.0.evidence.explicit_no_sponsorship": true,
+        "opportunities.0.evidence.sponsorship": {"status": "yes", "scope": "company_history", "evidence_id": "sponsor-history"}
+      },
+      "checks": [
+        {"path": "opportunities.0.tier", "equals": "SKIP"},
+        {"path": "opportunities.0.review_flags", "contains": "sponsorship_not_exact_role"}
+      ]
+    },
+    {
+      "id": "jev-30-adjacent-transition",
+      "description": "An adjacent transition adds a background-pathway judgment.",
+      "kind": "jev_plan",
+      "dimensions": ["candidate:adjacent-transition"],
+      "changes": {"candidate_profile.background_transition": "adjacent"},
+      "checks": [{"path": "requests.0.questions.3.name", "equals": "background_pathway_accessible"}]
+    },
+    {
+      "id": "jev-31-major-transition-sponsor",
+      "description": "A major transition with unresolved sponsorship asks both pathway and sponsorship questions.",
+      "kind": "jev_plan",
+      "dimensions": ["candidate:major-transition", "policy:future-sponsorship"],
+      "changes": {
+        "candidate_profile.background_transition": "major",
+        "candidate_profile.needs_sponsorship": true,
+        "opportunities.0.exact_role_sponsorship": "unknown"
+      },
+      "checks": [
+        {"path": "requests.0.questions.3.name", "equals": "background_pathway_accessible"},
+        {"path": "requests.0.questions.4.name", "equals": "sponsorship_evidence_supports_eligibility"}
+      ]
+    },
+    {
+      "id": "jev-32-nontechnical-hybrid",
+      "description": "A hybrid candidate receives choices derived from approved product and analytics areas.",
+      "kind": "jev_plan",
+      "dimensions": ["candidate:nontechnical-hybrid"],
+      "changes": {
+        "candidate_profile.target_areas": ["product-analytics", "solutions-engineering"],
+        "candidate_profile.background_transition": "adjacent"
+      },
+      "checks": [
+        {"path": "requests.0.questions.0.options", "contains": "product-analytics"},
+        {"path": "requests.0.questions.0.options", "contains": "other"}
+      ]
+    },
+    {
+      "id": "jev-33-filtered-not-needed",
+      "description": "A deterministic hard stop consumes no Jev questions.",
+      "kind": "jev_plan",
+      "dimensions": ["jev:not-needed"],
+      "changes": {"opportunities.0.prefilter_state": "BLOCKED"},
+      "checks": [
+        {"path": "state", "equals": "NOT_NEEDED"},
+        {"path": "question_count", "equals": 0}
+      ]
+    },
+    {
+      "id": "jev-34-ready-no-client",
+      "description": "A surviving opportunity is ready for Jev without claiming provider connectivity.",
+      "kind": "jev_plan",
+      "dimensions": ["jev:ready-no-client"],
+      "changes": {},
+      "checks": [
+        {"path": "state", "equals": "READY_FOR_JEV"},
+        {"path": "provider", "equals": null},
+        {"path": "model", "equals": null}
+      ]
+    },
+    {
+      "id": "jev-validate-35-fixture",
+      "description": "A typed fixture stays labeled fixture.",
+      "kind": "jev_validate",
+      "dimensions": ["jev:fixture"],
+      "changes": {},
+      "checks": [{"path": "provenance", "equals": "fixture"}]
+    },
+    {
+      "id": "jev-validate-36-malformed",
+      "description": "A malformed answer type is rejected.",
+      "kind": "jev_validate",
+      "dimensions": ["jev:malformed"],
+      "changes": {"result.answers.best_area.type": "score"},
+      "expected_error": "type"
+    },
+    {
+      "id": "jev-validate-37-stale-cache",
+      "description": "A stale cache cannot be used as a current judgment.",
+      "kind": "jev_validate",
+      "dimensions": ["jev:stale-cache"],
+      "changes": {
+        "result.provenance": "cache",
+        "result.cached_at": "2000-01-01T00:00:00+00:00"
+      },
+      "expected_error": "stale"
+    },
+    {
+      "id": "jev-validate-38-hash-mismatch",
+      "description": "A hash-mismatched cache is rejected.",
+      "kind": "jev_validate",
+      "dimensions": ["jev:hash-mismatch"],
+      "changes": {"result.request_hash": "0000000000000000000000000000000000000000000000000000000000000000"},
+      "expected_error": "request_hash"
+    },
+    {
+      "id": "jev-validate-39-cache-hit",
+      "description": "A fresh matching cache preserves cache provenance.",
+      "kind": "jev_validate",
+      "dimensions": ["jev:cache-hit"],
+      "changes": {
+        "result.provenance": "cache",
+        "result.cached_at": "__NOW__"
+      },
+      "checks": [{"path": "provenance", "equals": "cache"}]
+    },
+    {
+      "id": "jev-validate-40-live-retry-telemetry",
+      "description": "Observed live telemetry preserves a bounded retry count.",
+      "kind": "jev_validate",
+      "dimensions": ["jev:retry-telemetry"],
+      "changes": {
+        "result.provenance": "live",
+        "result.observed_at": "__NOW__",
+        "result.telemetry.provider": "typesafe",
+        "result.telemetry.model": "jev",
+        "result.telemetry.request_count": 1,
+        "result.telemetry.retry_count": 2
+      },
+      "checks": [
+        {"path": "provenance", "equals": "live"},
+        {"path": "telemetry.retry_count", "equals": 2}
+      ]
+    },
+    {
+      "id": "rank-41-fixed-session",
+      "description": "A verified fixed session keeps its exact interval.",
+      "kind": "rank",
+      "dimensions": ["session:fixed"],
+      "changes": {"opportunities.0.evidence.fixed_session": {"start_minute": 30, "end_minute": 45}},
+      "checks": [
+        {"path": "visit_schedule.0.fixed", "equals": true},
+        {"path": "visit_schedule.0.start_minute", "equals": 30.0}
+      ]
+    },
+    {
+      "id": "rank-42-flexible-session",
+      "description": "A verified flexible booth can receive a generated interval.",
+      "kind": "rank",
+      "dimensions": ["session:flexible"],
+      "changes": {},
+      "checks": [
+        {"path": "visit_schedule.0.fixed", "equals": false},
+        {"path": "opportunities.0.route_action", "equals": "VISIT"}
+      ]
+    },
+    {
+      "id": "rank-43-unknown-session",
+      "description": "Unknown access creates CHECK_SESSION and no route.",
+      "kind": "rank",
+      "dimensions": ["session:unknown"],
+      "changes": {
+        "opportunities.0.evidence.visit_access": "unknown",
+        "opportunities.0.evidence.session_status": "unknown"
+      },
+      "checks": [
+        {"path": "visit_schedule", "equals": []},
+        {"path": "opportunities.0.route_action", "equals": "CHECK_SESSION"}
+      ]
+    },
+    {
+      "id": "rank-44-low-access-confidence",
+      "description": "Verified-looking access below the confidence gate cannot be scheduled.",
+      "kind": "rank",
+      "dimensions": ["session:low-confidence"],
+      "changes": {"opportunities.0.visit_access_confidence": 0.79},
+      "checks": [
+        {"path": "visit_schedule", "equals": []},
+        {"path": "opportunities.0.route_exclusion_reason", "equals": "visit_access_confidence_below_0.80"}
+      ]
+    },
+    {
+      "id": "rank-45-session-conflict",
+      "description": "Overlapping fixed sessions keep only the higher-value visit.",
+      "kind": "rank",
+      "dimensions": ["session:conflict"],
+      "changes": {
+        "opportunities.0.evidence.fixed_session": {"start_minute": 15, "end_minute": 30},
+        "opportunities.1": {
+          "company": "Lower Value Co",
+          "role": "Software Intern",
+          "user_interest": 0.8,
+          "evidence": {"session_status": "verified", "visit_access": "verified", "fixed_session": {"start_minute": 20, "end_minute": 35}},
+          "judgments": {
+            "role_fit": {"type": "score", "score": 3, "confidence": 0.9},
+            "evidence_strength": {"type": "score", "score": 3, "confidence": 0.9},
+            "conversation_leverage": {"type": "score", "score": 3, "confidence": 0.9},
+            "information_gain": {"type": "score", "score": 2, "confidence": 0.9},
+            "best_area": {"type": "choice", "choice": "backend-swe", "confidence": 0.9}
+          }
+        }
+      },
+      "checks": [
+        {"path": "visit_schedule.0.company", "equals": "Example Co"},
+        {"path": "opportunities.1.review_flags", "contains": "schedule_conflict"}
+      ]
+    },
+    {
+      "id": "intake-46-unresolved-sponsorship",
+      "description": "Unresolved sponsorship need stops before ranking.",
+      "kind": "intake",
+      "dimensions": ["policy:unresolved-sponsorship"],
+      "changes": {"candidate_profile.needs_sponsorship": null},
+      "checks": [{"path": "decision_state", "equals": "STOP"}]
+    },
+    {
+      "id": "rank-47-location-hard-mismatch",
+      "description": "A verified location hard mismatch filters before Jev.",
+      "kind": "rank",
+      "dimensions": ["policy:location"],
+      "changes": {"opportunities.0.evidence.explicit_disqualifiers": ["location"]},
+      "checks": [{"path": "opportunities.0.reasons", "contains": "location"}]
+    },
+    {
+      "id": "rank-48-clearance-citizenship",
+      "description": "A verified clearance or citizenship mismatch filters before Jev.",
+      "kind": "rank",
+      "dimensions": ["policy:clearance-citizenship"],
+      "changes": {"opportunities.0.evidence.explicit_disqualifiers": ["clearance"]},
+      "checks": [{"path": "opportunities.0.reasons", "contains": "clearance"}]
+    },
+    {
+      "id": "rank-49-experience-gap",
+      "description": "A verified minimum-experience gap filters before Jev.",
+      "kind": "rank",
+      "dimensions": ["policy:experience-gap"],
+      "changes": {"opportunities.0.evidence.explicit_disqualifiers": ["minimum_experience"]},
+      "checks": [{"path": "opportunities.0.reasons", "contains": "minimum_experience"}]
+    },
+    {
+      "id": "rank-50-explicit-avoid",
+      "description": "An explicit user avoid area is a deterministic opt-out.",
+      "kind": "rank",
+      "dimensions": ["policy:explicit-avoid"],
+      "changes": {"opportunities.0.user_interest": 0},
+      "checks": [{"path": "opportunities.0.reasons", "contains": "user_opt_out"}]
+    },
+    {
+      "id": "rank-51-soft-salary",
+      "description": "A soft salary preference does not create a hard rejection.",
+      "kind": "rank",
+      "dimensions": ["policy:salary-soft"],
+      "changes": {"candidate_profile.salary": {"minimum": 100000, "currency": "USD", "hard_constraint": false}},
+      "checks": [{"path": "opportunities.0.tier", "equals": "MUST_VISIT"}]
+    },
+    {
+      "id": "regression-52-domestic-public-preview",
+      "description": "Replay the prior domestic no-registration input.",
+      "kind": "regression",
+      "fixture": "tests/fixtures/regression-domestic-public-preview.json",
+      "checks": [
+        {"path": "decision_state", "equals": "PARTIAL"},
+        {"path": "visit_schedule", "equals": []},
+        {"path": "coverage_complete", "equals": false}
+      ]
+    },
+    {
+      "id": "regression-53-sponsor-public-preview",
+      "description": "Replay the prior sponsor-needed no-registration input.",
+      "kind": "regression",
+      "fixture": "tests/fixtures/regression-sponsor-public-preview.json",
+      "checks": [
+        {"path": "decision_state", "equals": "PARTIAL"},
+        {"path": "sponsorship_scopes", "contains": "employer_event_card"}
+      ]
+    },
+    {
+      "id": "regression-54-high-evidence",
+      "description": "Replay the prior high-evidence input and schedule only verified access.",
+      "kind": "regression",
+      "fixture": "tests/fixtures/regression-high-evidence.json",
+      "checks": [
+        {"path": "decision_state", "equals": "FULL"},
+        {"path": "scheduled_companies", "contains": "Synthetic Atlas Systems"},
+        {"path": "unscheduled_companies", "contains": "Synthetic Nimbus Analytics"}
+      ]
+    },
+    {
+      "id": "regression-55-transition-sponsor",
+      "description": "Replay the prior transition-and-sponsorship input.",
+      "kind": "regression",
+      "fixture": "tests/fixtures/regression-transition-sponsor.json",
+      "checks": [
+        {"path": "requests.0.questions.5.name", "equals": "background_pathway_accessible"},
+        {"path": "requests.0.questions.6.name", "equals": "sponsorship_evidence_supports_eligibility"}
+      ]
+    },
+    {
+      "id": "regression-56-sparse-ambiguous",
+      "description": "Replay the prior sparse ambiguous input without fabricating FULL.",
+      "kind": "regression",
+      "fixture": "tests/fixtures/regression-sparse-ambiguous.json",
+      "checks": [{"path": "decision_state", "equals": "STOP"}]
+    },
+    {
+      "id": "regression-57-jev-baseline",
+      "description": "Replay the prior Jev fixture without claiming a live call.",
+      "kind": "regression",
+      "fixture": "tests/fixtures/regression-jev-baseline.json",
+      "checks": [
+        {"path": "provenance", "equals": "fixture"},
+        {"path": "telemetry.provider", "equals": null}
       ]
     }
   ]
