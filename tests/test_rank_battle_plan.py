@@ -85,6 +85,132 @@ def document(*opportunities, needs_sponsorship=False, duration=180, reserve=30, 
 
 
 class BattlePlanTests(unittest.TestCase):
+    def test_exact_role_no_sponsorship_filters_before_jev_scores_are_required(self):
+        ranker = load_ranker()
+        item = {
+            "company": "Blocked Co",
+            "role": "Software Intern",
+            "user_interest": 1.0,
+            "evidence_level": "EXACT_ROLE",
+            "evidence_ids": ["sponsor-no"],
+            "evidence": {
+                "sponsorship": {
+                    "status": "no",
+                    "scope": "exact_role",
+                    "evidence_id": "sponsor-no",
+                },
+                "visit_access": "unknown",
+                "session_status": "unknown",
+            },
+            "judgments": {},
+        }
+        payload = document(item, needs_sponsorship=True)
+        payload["evidence_records"] = [
+            {"claim_id": "sponsor-no", "claim": "Exact role says no."}
+        ]
+
+        result = ranker.build_battle_plan(payload)["opportunities"][0]
+
+        self.assertEqual(result["prefilter_state"], "BLOCKED")
+        self.assertEqual(result["tier"], "SKIP")
+        self.assertFalse(result["jev_required"])
+        self.assertEqual(result["evidence_ids"], ["sponsor-no"])
+
+    def test_user_opt_out_filters_without_judgments(self):
+        item = {
+            "company": "Avoided Co",
+            "role": "Sales",
+            "user_interest": 0.0,
+            "evidence_level": "TITLE_ONLY",
+            "evidence": {"visit_access": "unknown", "session_status": "unknown"},
+            "judgments": {},
+        }
+
+        result = load_ranker().build_battle_plan(document(item))["opportunities"][0]
+
+        self.assertEqual(result["prefilter_state"], "BLOCKED")
+        self.assertIn("user_opt_out", result["reasons"])
+        self.assertFalse(result["jev_required"])
+
+    def test_exact_eligibility_mismatches_filter_without_judgments(self):
+        for reason in ("citizenship", "clearance", "minimum_experience"):
+            with self.subTest(reason=reason):
+                item = {
+                    "company": f"Blocked {reason}",
+                    "role": "Engineer",
+                    "user_interest": 1.0,
+                    "evidence_level": "EXACT_ROLE",
+                    "evidence": {
+                        "explicit_disqualifiers": [reason],
+                        "visit_access": "verified",
+                        "session_status": "verified",
+                    },
+                    "judgments": {},
+                }
+                result = load_ranker().build_battle_plan(document(item))["opportunities"][0]
+                self.assertEqual(result["prefilter_state"], "BLOCKED")
+                self.assertIn(reason, result["reasons"])
+                self.assertFalse(result["jev_required"])
+
+    def test_duplicate_role_is_audited_and_filtered(self):
+        first = opportunity("Duplicate Co", "Software Intern")
+        second = opportunity("Duplicate Co", "Software Intern")
+
+        results = load_ranker().build_battle_plan(document(first, second))["opportunities"]
+        duplicate = next(item for item in results if "duplicate_role" in item["reasons"])
+
+        self.assertEqual(duplicate["prefilter_state"], "BLOCKED")
+        self.assertEqual(duplicate["tier"], "SKIP")
+        self.assertFalse(duplicate["jev_required"])
+
+    def test_unavailable_visit_channel_filters_route_to_apply_online(self):
+        item = {
+            "company": "Online Only Co",
+            "role": "Software Intern",
+            "user_interest": 1.0,
+            "evidence_level": "EXACT_ROLE",
+            "evidence": {"visit_access": "unavailable", "session_status": "full"},
+            "judgments": {},
+        }
+
+        result = load_ranker().build_battle_plan(document(item))["opportunities"][0]
+
+        self.assertEqual(result["prefilter_state"], "BLOCKED")
+        self.assertEqual(result["tier"], "APPLY_ONLINE")
+        self.assertIn("visit_channel_unavailable", result["reasons"])
+        self.assertFalse(result["jev_required"])
+
+    def test_employer_card_no_sponsorship_does_not_hard_filter(self):
+        item = {
+            "company": "Card Scope Co",
+            "role": "Software Intern",
+            "user_interest": 1.0,
+            "evidence_level": "TITLE_ONLY",
+            "evidence_ids": ["card-sponsor-no"],
+            "evidence": {
+                "sponsorship": {
+                    "status": "no",
+                    "scope": "employer_event_card",
+                    "evidence_id": "card-sponsor-no",
+                },
+                "visit_access": "unknown",
+                "session_status": "unknown",
+            },
+            "judgments": {},
+        }
+        payload = document(item, needs_sponsorship=True)
+        payload["evidence_records"] = [
+            {"claim_id": "card-sponsor-no", "claim": "Employer card language."}
+        ]
+
+        result = load_ranker().build_battle_plan(payload)["opportunities"][0]
+
+        self.assertEqual(result["prefilter_state"], "SURVIVES")
+        self.assertNotEqual(result["tier"], "SKIP")
+        self.assertEqual(result["decision_state"], "PARTIAL")
+        self.assertTrue(result["jev_required"])
+        self.assertIn("sponsorship_not_exact_role", result["review_flags"])
+
     def test_rejects_unapproved_candidate_profile(self):
         ranker = load_ranker()
         payload = document(opportunity("A", "SWE"))

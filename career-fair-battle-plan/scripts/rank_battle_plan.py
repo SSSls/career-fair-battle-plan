@@ -25,6 +25,12 @@ SCORE_FIELDS = (
     "conversation_leverage",
     "information_gain",
 )
+PRELIMINARY_PRIORITIES = (
+    "HIGH_VERIFY_FIRST",
+    "MEDIUM_VERIFY",
+    "DISCOVERY_ONLY",
+    "LOW_DISCOVERY",
+)
 
 
 def _number(value: Any, field: str) -> float:
@@ -149,9 +155,15 @@ def _structured_policy(
         scope = sponsorship.get("scope")
         if status not in {"yes", "no", "unknown"}:
             raise ValueError(f"{field_prefix}.sponsorship.status must be yes, no, or unknown")
-        if scope not in {"exact_role", "company_current", "company_history"}:
+        if scope not in {
+            "exact_role",
+            "company_current",
+            "company_history",
+            "employer_event_card",
+        }:
             raise ValueError(
-                f"{field_prefix}.sponsorship.scope must be exact_role, company_current, or company_history"
+                f"{field_prefix}.sponsorship.scope must be exact_role, "
+                "employer_event_card, company_current, or company_history"
             )
         evidence_id = sponsorship.get("evidence_id")
         if status != "unknown" and evidence_id is None:
@@ -235,6 +247,72 @@ def _structured_policy(
         flags.append("headcount_unknown")
 
     return reasons, flags, evidence_ids
+
+
+def prefilter_opportunity(
+    opportunity: dict[str, Any], candidate_profile: dict[str, Any]
+) -> dict[str, Any]:
+    """Apply verified hard facts before any Jev score is required."""
+    if not isinstance(opportunity, dict):
+        raise ValueError("opportunity must be an object")
+    if not isinstance(candidate_profile, dict):
+        raise ValueError("candidate_profile must be an object")
+    needs_sponsorship = candidate_profile.get("needs_sponsorship")
+    if not isinstance(needs_sponsorship, bool):
+        raise ValueError("candidate_profile.needs_sponsorship must be true or false")
+    evidence = opportunity.get("evidence", {})
+    if not isinstance(evidence, dict):
+        raise ValueError("opportunity.evidence must be an object")
+    explicit_disqualifiers = evidence.get("explicit_disqualifiers", [])
+    if not isinstance(explicit_disqualifiers, list) or not all(
+        isinstance(item, str) and item for item in explicit_disqualifiers
+    ):
+        raise ValueError(
+            "opportunity.evidence.explicit_disqualifiers must be a list of non-empty strings"
+        )
+    salary_policy, headcount_importance = _profile_policy(candidate_profile)
+    policy_reasons, policy_flags, structured_evidence_ids = _structured_policy(
+        evidence,
+        needs_sponsorship,
+        salary_policy,
+        headcount_importance,
+        "opportunity.evidence",
+    )
+    user_interest = _bounded(
+        opportunity.get("user_interest", 0.5), "opportunity.user_interest", 0, 1
+    )
+    reasons = list(explicit_disqualifiers) + list(policy_reasons)
+    if user_interest == 0:
+        reasons.append("user_opt_out")
+    if needs_sponsorship and evidence.get("explicit_no_sponsorship") is True:
+        reasons.append("explicit_no_sponsorship")
+    if opportunity.get("_duplicate_role") is True:
+        reasons.append("duplicate_role")
+    visit_access = evidence.get("visit_access", "unknown")
+    if visit_access not in {"verified", "unknown", "unavailable"}:
+        raise ValueError("opportunity.evidence.visit_access must be verified, unknown, or unavailable")
+    if visit_access == "unavailable":
+        reasons.append("visit_channel_unavailable")
+
+    reasons = list(dict.fromkeys(reasons))
+    blocked = bool(reasons)
+    only_visit_block = blocked and set(reasons) == {"visit_channel_unavailable"}
+    judgments = opportunity.get("judgments", {})
+    if not isinstance(judgments, dict):
+        raise ValueError("opportunity.judgments must be an object")
+    required_answers_present = all(field in judgments for field in SCORE_FIELDS) and (
+        "best_area" in judgments
+    )
+    return {
+        "prefilter_state": "BLOCKED" if blocked else "SURVIVES",
+        "reasons": reasons,
+        "review_flags": sorted(set(policy_flags)),
+        "structured_evidence_ids": structured_evidence_ids,
+        "next_branch": (
+            "APPLY_ONLINE" if only_visit_block else "SKIP" if blocked else "RANK"
+        ),
+        "jev_required": not blocked and not required_answers_present,
+    }
 
 
 def _subtract_interval(
@@ -326,52 +404,31 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
         evidence_record_ids.add(claim_id)
 
     evaluated: list[dict[str, Any]] = []
+    seen_roles: set[tuple[str, str]] = set()
     for index, opportunity in enumerate(opportunities):
         if not isinstance(opportunity, dict):
             raise ValueError(f"opportunities[{index}] must be an object")
-        judgments = opportunity.get("judgments")
+        company = opportunity.get("company", "unknown")
+        role = opportunity.get("role", "unknown")
+        if not isinstance(company, str) or not isinstance(role, str):
+            raise ValueError(f"opportunities[{index}].company and role must be strings")
+        role_key = (company.casefold().strip(), role.casefold().strip())
+        prepared = dict(opportunity)
+        prepared["_duplicate_role"] = role_key in seen_roles
+        seen_roles.add(role_key)
+        evidence = opportunity.get("evidence", {})
+        if not isinstance(evidence, dict):
+            raise ValueError(f"opportunities[{index}].evidence must be an object")
+        prefilter = prefilter_opportunity(prepared, profile)
+        judgments = opportunity.get("judgments", {})
         if not isinstance(judgments, dict):
             raise ValueError(f"opportunities[{index}].judgments must be an object")
-
-        normalized = {field: _score_value(judgments, field) for field in SCORE_FIELDS}
         user_interest = _bounded(
             opportunity.get("user_interest", 0.5),
             f"opportunities[{index}].user_interest",
             0,
             1,
         )
-        composite = sum(normalized[field] * weights[field] for field in SCORE_FIELDS)
-        composite += user_interest * weights["user_interest"]
-
-        evidence = opportunity.get("evidence", {})
-        if not isinstance(evidence, dict):
-            raise ValueError(f"opportunities[{index}].evidence must be an object")
-        explicit_disqualifiers = evidence.get("explicit_disqualifiers", [])
-        if not isinstance(explicit_disqualifiers, list) or not all(
-            isinstance(item, str) and item for item in explicit_disqualifiers
-        ):
-            raise ValueError(
-                f"opportunities[{index}].evidence.explicit_disqualifiers "
-                "must be a list of non-empty strings"
-            )
-        policy_reasons, policy_flags, structured_evidence_ids = _structured_policy(
-            evidence,
-            needs_sponsorship,
-            salary_policy,
-            headcount_importance,
-            f"opportunities[{index}].evidence",
-        )
-        blocked = bool(explicit_disqualifiers) or bool(policy_reasons) or user_interest == 0
-        blocked = blocked or (
-            needs_sponsorship and evidence.get("explicit_no_sponsorship") is True
-        )
-        reasons: list[str] = []
-        if needs_sponsorship and evidence.get("explicit_no_sponsorship") is True:
-            reasons.append("explicit_no_sponsorship")
-        reasons.extend(explicit_disqualifiers)
-        reasons.extend(policy_reasons)
-        if user_interest == 0:
-            reasons.append("user_opt_out")
 
         evidence_ids = opportunity.get("evidence_ids", [])
         if not isinstance(evidence_ids, list) or not all(
@@ -380,7 +437,9 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
             raise ValueError(
                 f"opportunities[{index}].evidence_ids must be a list of non-empty strings"
             )
-        evidence_ids = list(dict.fromkeys(evidence_ids + structured_evidence_ids))
+        evidence_ids = list(
+            dict.fromkeys(evidence_ids + prefilter["structured_evidence_ids"])
+        )
         missing_evidence = sorted(set(evidence_ids) - evidence_record_ids)
         if missing_evidence:
             raise ValueError(
@@ -410,9 +469,44 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
                 )
             fixed_session = {"start_minute": start, "end_minute": end}
 
-        review_flags = sorted(
-            set(_review_flags(opportunity, confidence_floor, needs_sponsorship) + policy_flags)
+        evidence_level = opportunity.get("evidence_level", "EXACT_ROLE")
+        if evidence_level not in {
+            "EMPLOYER_NAME",
+            "EMPLOYER_CARD",
+            "TITLE_ONLY",
+            "EXACT_ROLE",
+            "SESSION_VERIFIED",
+        }:
+            raise ValueError(f"opportunities[{index}].evidence_level is invalid")
+        decision_state = (
+            "FULL" if evidence_level in {"EXACT_ROLE", "SESSION_VERIFIED"} else "PARTIAL"
         )
+        blocked = prefilter["prefilter_state"] == "BLOCKED"
+        if blocked:
+            normalized = {field: 0.0 for field in SCORE_FIELDS}
+            composite = user_interest * weights["user_interest"]
+            review_flags = list(prefilter["review_flags"])
+        elif decision_state == "PARTIAL":
+            normalized = {field: 0.0 for field in SCORE_FIELDS}
+            if isinstance(judgments.get("role_fit"), dict):
+                normalized["role_fit"] = _score_value(judgments, "role_fit")
+            composite = normalized["role_fit"] * weights["role_fit"]
+            composite += user_interest * weights["user_interest"]
+            review_flags = list(prefilter["review_flags"])
+            if evidence.get("visit_access", "unknown") == "unknown":
+                review_flags.append("visit_access")
+            if needs_sponsorship:
+                sponsorship = evidence.get("sponsorship")
+                if not isinstance(sponsorship, dict) or sponsorship.get("scope") != "exact_role":
+                    review_flags.append("sponsorship_not_exact_role")
+        else:
+            normalized = {field: _score_value(judgments, field) for field in SCORE_FIELDS}
+            composite = sum(normalized[field] * weights[field] for field in SCORE_FIELDS)
+            composite += user_interest * weights["user_interest"]
+            review_flags = _review_flags(
+                opportunity, confidence_floor, needs_sponsorship
+            ) + list(prefilter["review_flags"])
+        review_flags = sorted(set(review_flags))
         critical_names = set(SCORE_FIELDS) | {
             "best_area",
             "visit_access",
@@ -447,8 +541,8 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
 
         evaluated.append(
             {
-                "company": opportunity.get("company", "unknown"),
-                "role": opportunity.get("role", "unknown"),
+                "company": company,
+                "role": role,
                 "best_area": judgments.get("best_area", {}).get("choice", "other"),
                 "visit_score": round(composite * 100, 1),
                 "normalized_dimensions": {
@@ -456,9 +550,25 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
                     "user_interest": user_interest,
                 },
                 "review_flags": review_flags,
-                "reasons": reasons,
+                "reasons": prefilter["reasons"],
                 "evidence_ids": evidence_ids,
-                "blocked": blocked,
+                "prefilter_state": prefilter["prefilter_state"],
+                "jev_required": prefilter["jev_required"],
+                "decision_state": decision_state,
+                "preliminary_priority": (
+                    "HIGH_VERIFY_FIRST"
+                    if decision_state == "PARTIAL"
+                    and evidence_level == "TITLE_ONLY"
+                    and user_interest >= 0.75
+                    else "MEDIUM_VERIFY"
+                    if decision_state == "PARTIAL" and evidence_level == "TITLE_ONLY"
+                    else "DISCOVERY_ONLY"
+                    if decision_state == "PARTIAL" and evidence_level == "EMPLOYER_CARD"
+                    else "LOW_DISCOVERY"
+                    if decision_state == "PARTIAL"
+                    else None
+                ),
+                "tier": prefilter["next_branch"] if blocked else None,
                 "_fixed_session": fixed_session,
                 "_requires_review": requires_review,
                 "_visit_access": evidence.get("visit_access", "unknown"),
@@ -471,8 +581,10 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
 
     visit_candidates: list[dict[str, Any]] = []
     for item in evaluated:
-        if item["blocked"]:
-            item["tier"] = "SKIP"
+        if item["prefilter_state"] == "BLOCKED":
+            continue
+        if item["decision_state"] == "PARTIAL":
+            continue
         elif item["_visit_access"] == "unavailable":
             item["tier"] = "APPLY_ONLINE"
         elif item["_role_fit"] >= 0.75 and item["_conversation_leverage"] < 0.5:
@@ -527,7 +639,13 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
         else:
             item["tier"] = "IF_TIME"
 
-    tier_order = {"MUST_VISIT": 0, "IF_TIME": 1, "APPLY_ONLINE": 2, "SKIP": 3}
+    tier_order = {
+        "MUST_VISIT": 0,
+        "IF_TIME": 1,
+        None: 2,
+        "APPLY_ONLINE": 3,
+        "SKIP": 4,
+    }
     evaluated.sort(
         key=lambda item: (tier_order[item["tier"]], -item["visit_score"], item["company"], item["role"])
     )
@@ -542,7 +660,6 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
                     **item["_assigned_session"],
                 }
             )
-        item.pop("blocked")
         item.pop("_fixed_session")
         item.pop("_requires_review")
         item.pop("_assigned_session", None)
