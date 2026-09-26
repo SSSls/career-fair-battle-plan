@@ -143,7 +143,7 @@ python3 career-fair-battle-plan/scripts/rank_battle_plan.py \
   -o battle_plan.json
 ```
 
-运行 22 个场景的 Scenario Matrix：
+运行 57 个场景的 Scenario Matrix：
 
 ```bash
 python3 career-fair-battle-plan/scripts/run_scenario_matrix.py \
@@ -152,6 +152,28 @@ python3 career-fair-battle-plan/scripts/run_scenario_matrix.py \
 ```
 
 这些命令只执行确定性政策和排名逻辑。它们本身不会读取简历、浏览 Fair、调用 Jev，也不会执行任何外部操作。
+
+可直接复制执行的完整 Smoke Test（特意保持单行命令）：
+
+```bash
+python3 career-fair-battle-plan/scripts/assess_intake.py career-fair-battle-plan/examples/sample_input.json
+python3 career-fair-battle-plan/scripts/run_scenario_matrix.py career-fair-battle-plan/examples/scenario_matrix.json
+python3 /Users/sunchunxuan/.codex/skills/.system/skill-creator/scripts/quick_validate.py career-fair-battle-plan
+```
+
+这里展示的是 macOS Codex 默认校验器路径；如果你的安装位置不同，请替换为本机的 `quick_validate.py` 路径。
+
+## V2 决策状态与信息边界
+
+四种来源模式是 `UPLOAD`、`PUBLIC_WEB`、`PUBLIC_PREVIEW` 和 `AUTHENTICATED_READ_ONLY`。`PUBLIC_PREVIEW` 不要求注册活动，也可以做初步匹配，但往往只有公司卡片或岗位标题片段，不能证明公司名单完整、JD 完整、Sponsor 政策或 Session 仍有空位。
+
+登录状态、活动注册状态、只读授权和写入权限分别记录。`AUTHENTICATED_READ_ONLY` 表示用户自己完成登录，并授权读取当前可见页面。工作流不会注册活动或 Session、加入候补、投递或发送消息；也就是它**不会注册**，不会修改账号。
+
+每个机会都会输出 `STOP / PARTIAL / FULL`。公司卡片等不完整线索只能得到 preliminary priority 和置信度上限；最终 Tier 需要具体岗位判断，时间表只接收已经验证的访问路线。
+
+Jev 的成本控制顺序是：先用确定性规则过滤，再只为剩余语义问题生成类型化请求。每个结果都必须带 `live`、`fixture`、`fallback` 或 `cache` provenance、request hash 和 telemetry。本仓库不内置 Jev Client 或 Key。建议把本地 cache 放在 `.cache/career-fair-battle-plan/jev/`，并排除在 Git 外，因为压缩后的候选人信息仍可能敏感。
+
+不使用 Git 时，选择 **Code → Download ZIP**，解压后按上文复制包含 `SKILL.md` 的内层目录。
 
 ## 准备输入
 
@@ -347,8 +369,8 @@ tests/
 
 ## 验证情况
 
-- 38 个确定性和文档行为测试；
-- 22 个可编辑参数化场景；
+- 85 个确定性和文档行为测试；
+- 57 个可编辑参数化场景；
 - 10 个独立 Agent 模拟：3 个无 Skill baseline 和 7 个使用 Skill 的 forward test；
 - 官方 `quick_validate.py` 包结构验证。
 

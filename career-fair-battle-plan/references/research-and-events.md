@@ -10,6 +10,8 @@ Use the strongest available read-only path:
 2. public event and employer URLs;
 3. an authenticated browser tab the user has made available, limited to visible/read-only navigation. This is mandatory for live Handshake retrieval.
 
+A Handshake `PUBLIC_PREVIEW` can be used without registration for preliminary employer-card matching. It cannot establish complete fair coverage, a complete JD, or current session availability. LinkedIn-visible pages, school pages, and employer careers pages follow the same rule: visibility is evidence only for the content actually observed.
+
 For the full access gate and login boundary, read [intake-and-access.md](intake-and-access.md). Do not bypass authentication, reverse-engineer private endpoints, evade access controls, or claim access to hidden Handshake jobs. When login/session access is unavailable, ask for an export or mark the data unavailable.
 
 ## Two-stage research
@@ -51,3 +53,5 @@ For every material claim capture the data-contract fields. `published_at` may be
 Also derive `visit_access` across all usable channels. A full 1:1 can still have `visit_access=verified` when a booth or group session is confirmed. When no usable channel is available, set `visit_access=unavailable`; when unresolved, set `unknown`. Record verified fixed sessions as start/end minutes relative to the fair start so deterministic code can detect conflicts.
 
 Never turn `unknown` into an instruction to register. Propose checking availability. Even when a slot is visibly available, ask for confirmation immediately before registration, waitlisting, messaging, emailing, or applying.
+
+Use [source-adapters.md](source-adapters.md) for normalization and [decision-states.md](decision-states.md) before issuing priorities or a route.

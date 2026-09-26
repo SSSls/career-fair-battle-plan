@@ -144,7 +144,7 @@ python3 career-fair-battle-plan/scripts/rank_battle_plan.py \
   -o battle_plan.json
 ```
 
-Run the 22-scenario matrix:
+Run the 57-scenario matrix:
 
 ```bash
 python3 career-fair-battle-plan/scripts/run_scenario_matrix.py \
@@ -153,6 +153,28 @@ python3 career-fair-battle-plan/scripts/run_scenario_matrix.py \
 ```
 
 These commands exercise deterministic policy and ranking. They do not read a résumé, browse a fair, call Jev, or create external actions by themselves.
+
+Complete copy/paste smoke test (commands intentionally shown on one line):
+
+```bash
+python3 career-fair-battle-plan/scripts/assess_intake.py career-fair-battle-plan/examples/sample_input.json
+python3 career-fair-battle-plan/scripts/run_scenario_matrix.py career-fair-battle-plan/examples/scenario_matrix.json
+python3 /Users/sunchunxuan/.codex/skills/.system/skill-creator/scripts/quick_validate.py career-fair-battle-plan
+```
+
+The validator path is the default macOS Codex location; use the matching `quick_validate.py` path in your own Codex installation if different.
+
+## V2 decision and source boundaries
+
+The four source modes are `UPLOAD`, `PUBLIC_WEB`, `PUBLIC_PREVIEW`, and `AUTHENTICATED_READ_ONLY`. A `PUBLIC_PREVIEW` can support preliminary matching without event registration, but it may expose only employer cards or title snippets. It does not prove complete employer coverage, exact JDs, sponsor policy, or available sessions.
+
+Authentication, registration, read-only authorization, and mutation permission are stored independently. `AUTHENTICATED_READ_ONLY` means the user logged in themselves and authorized inspection of visible pages. The workflow does not register for an event or session, join a waitlist, apply, or message anyone; in short, it **does not register** or mutate an account.
+
+Every opportunity reports `STOP / PARTIAL / FULL` decision readiness. Partial employer-card leads receive preliminary priorities and confidence caps; final tiers require exact-role judgments, and the route schedules only verified visit access.
+
+Jev cost control applies deterministic filters first, then builds only the remaining typed questions. Every answer requires `live`, `fixture`, `fallback`, or `cache` provenance plus a request hash and telemetry. This repository ships no embedded Jev client or key. Suggested local cache location: `.cache/career-fair-battle-plan/jev/`; keep it out of Git because condensed candidate context may still be sensitive.
+
+To install without Git, choose **Code → Download ZIP**, extract it, and copy the inner folder containing `SKILL.md` as described above.
 
 ## Prepare your inputs
 
@@ -349,8 +371,8 @@ Missing or conflicting evidence remains `unknown`; historical H-1B/PERM activity
 
 ## Validation
 
-- 38 deterministic and documentation behavior tests;
-- 22 editable parameterized scenarios;
+- 85 deterministic and documentation behavior tests;
+- 57 editable parameterized scenarios;
 - 10 independent agent simulations: 3 no-skill baselines and 7 skill-enabled forward tests;
 - official `quick_validate.py` package validation.
 

@@ -144,3 +144,21 @@ Each card contains:
 - 2–3 English questions, each followed by a Chinese translation;
 - session status: `verified`, `unverified`, `full`, or `unknown`;
 - proposed external action and whether confirmation is required.
+
+## V2 access and decision contracts
+
+An access record keeps source, authentication, registration, authorization, and mutation independent:
+
+```json
+{
+  "source_mode": "PUBLIC_PREVIEW",
+  "authentication_state": "NOT_REQUIRED",
+  "registration_state": "NOT_REGISTERED",
+  "authorization_scope": "NONE",
+  "mutation_allowed": false
+}
+```
+
+An opportunity decision includes `decision_state` (`STOP | PARTIAL | FULL`), `evidence_confidence`, `match_confidence`, `visit_access_confidence`, `decision_confidence`, `route_ready`, `confidence_caps`, and `review_flags`. `PARTIAL` opportunities use a preliminary priority; only fully scored opportunities receive final tiers.
+
+A Jev request contains a condensed `state` and a list of typed questions. A result contains the canonical `request_hash`, typed `answers`, mandatory `provenance`, optional observation/cache timestamp, and telemetry. See [jev-judgments.md](jev-judgments.md).

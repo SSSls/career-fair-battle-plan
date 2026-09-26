@@ -17,6 +17,12 @@ Use a structured object containing:
 
 Exclude name, contact information, street address, photo, age, gender, race, and other protected or irrelevant traits. Do not paste the full resume.
 
+## Jev-first cost control
+
+“Jev-first” means Jev is the default semantic judge after cheap deterministic work—not that every row receives a model call. First remove duplicates, explicit opt-outs, exact-role hard failures, and unavailable routes. Then run `plan_jev_requests.py`; it asks only questions whose answers are still needed. Blocked opportunities return `NOT_NEEDED` and incur no Jev cost.
+
+This repository does not embed a Jev client or API key. A planned request is `READY_FOR_JEV`, not evidence that a call happened.
+
 ## One request, atomic questions
 
 Build `best_area.criteria` dynamically from the approved union of inferred fit, stated preferences, and pivots, excluding avoided areas. Add `other`.
@@ -105,3 +111,9 @@ Ask the sponsorship question in the same request if convenient, but ignore it in
 - Never ask Jev for the final tier or a composite visit score. Run the deterministic ranker.
 
 Record `provider`, resolved model version, request timestamp, and a hash of normalized state plus questions so results can be cached and audited.
+
+## Validation, provenance, and cache
+
+Run every response through `validate_jev_results.py`. `provenance` is mandatory and must be `live`, `fixture`, `fallback`, or `cache`. Only `live` may claim a provider/model; fixture and fallback must not. A cache hit must match the canonical SHA-256 request hash and be no older than seven days. Keep cache artifacts outside the Skill package (for example `.cache/career-fair-battle-plan/jev/`) and never commit CV data, credentials, or session content.
+
+Record request/question counts, latency, retries, input/output tokens, and cost when available. A fallback is a labeled degraded mode, not Jev.

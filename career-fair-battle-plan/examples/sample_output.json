@@ -45,51 +45,142 @@
       "evidence_ids": [
         "northstar-role"
       ],
-      "tier": "IF_TIME"
+      "evidence_records": [
+        {
+          "claim_id": "northstar-role",
+          "claim": "Northstar Health currently lists the supplied Software Engineering Intern role.",
+          "status": "yes",
+          "source_url": "https://example.invalid/northstar/software-intern",
+          "artifact_reference": null,
+          "publisher": "Northstar Health",
+          "published_at": "2026-09-20",
+          "accessed_at": "2026-09-23",
+          "source_quality": "primary",
+          "notes": "Anonymized example source."
+        }
+      ],
+      "evidence": {
+        "explicit_no_sponsorship": false,
+        "explicit_disqualifiers": [],
+        "eligibility_unknowns": [],
+        "sponsorship_status": "unknown",
+        "session_status": "verified",
+        "visit_access": "verified"
+      },
+      "visit_access_confidence": 0.9,
+      "prefilter_state": "SURVIVES",
+      "jev_required": false,
+      "decision_state": "FULL",
+      "preliminary_priority": null,
+      "tier": "IF_TIME",
+      "assigned_session": {
+        "start_minute": 0.0,
+        "end_minute": 15.0
+      },
+      "route_action": "VISIT",
+      "route_exclusion_reason": null
     },
     {
       "company": "Remote Tools",
       "role": "Backend Engineering Intern",
       "best_area": "backend-swe",
-      "visit_score": 65.1,
+      "visit_score": 12.0,
       "normalized_dimensions": {
-        "role_fit": 1.0,
-        "evidence_strength": 0.875,
-        "conversation_leverage": 0.25,
-        "information_gain": 0.25,
+        "role_fit": 0.0,
+        "evidence_strength": 0.0,
+        "conversation_leverage": 0.0,
+        "information_gain": 0.0,
         "user_interest": 0.8
       },
       "review_flags": [
         "sponsorship_structured_evidence_missing"
       ],
-      "reasons": [],
+      "reasons": [
+        "visit_channel_unavailable"
+      ],
       "evidence_ids": [
         "remote-tools-role"
       ],
-      "tier": "APPLY_ONLINE"
+      "evidence_records": [
+        {
+          "claim_id": "remote-tools-role",
+          "claim": "Remote Tools currently lists the supplied Backend Engineering Intern role.",
+          "status": "yes",
+          "source_url": "https://example.invalid/remote-tools/backend-intern",
+          "artifact_reference": null,
+          "publisher": "Remote Tools",
+          "published_at": "2026-09-21",
+          "accessed_at": "2026-09-23",
+          "source_quality": "primary",
+          "notes": "Anonymized example source."
+        }
+      ],
+      "evidence": {
+        "explicit_no_sponsorship": false,
+        "explicit_disqualifiers": [],
+        "eligibility_unknowns": [],
+        "sponsorship_status": "yes",
+        "session_status": "full",
+        "visit_access": "unavailable"
+      },
+      "visit_access_confidence": 0.9,
+      "prefilter_state": "BLOCKED",
+      "jev_required": false,
+      "decision_state": "FULL",
+      "preliminary_priority": null,
+      "tier": "APPLY_ONLINE",
+      "route_action": "APPLY_ONLINE",
+      "route_exclusion_reason": "visit_channel_unavailable"
     },
     {
       "company": "Closed Door Cloud",
       "role": "Platform Intern",
       "best_area": "backend-swe",
-      "visit_score": 77.2,
+      "visit_score": 13.5,
       "normalized_dimensions": {
-        "role_fit": 1.0,
-        "evidence_strength": 0.75,
-        "conversation_leverage": 0.75,
-        "information_gain": 0.25,
+        "role_fit": 0.0,
+        "evidence_strength": 0.0,
+        "conversation_leverage": 0.0,
+        "information_gain": 0.0,
         "user_interest": 0.9
       },
-      "review_flags": [
-        "negative:sponsorship_evidence_supports_eligibility"
-      ],
+      "review_flags": [],
       "reasons": [
         "explicit_no_sponsorship"
       ],
       "evidence_ids": [
         "closed-door-sponsorship"
       ],
-      "tier": "SKIP"
+      "evidence_records": [
+        {
+          "claim_id": "closed-door-sponsorship",
+          "claim": "The supplied Platform Intern role explicitly does not sponsor.",
+          "status": "yes",
+          "source_url": "https://example.invalid/closed-door/platform-intern",
+          "artifact_reference": null,
+          "publisher": "Closed Door Cloud",
+          "published_at": "2026-09-22",
+          "accessed_at": "2026-09-23",
+          "source_quality": "primary",
+          "notes": "Anonymized example source."
+        }
+      ],
+      "evidence": {
+        "explicit_no_sponsorship": true,
+        "explicit_disqualifiers": [],
+        "eligibility_unknowns": [],
+        "sponsorship_status": "no",
+        "session_status": "verified",
+        "visit_access": "verified"
+      },
+      "visit_access_confidence": 0.9,
+      "prefilter_state": "BLOCKED",
+      "jev_required": false,
+      "decision_state": "FULL",
+      "preliminary_priority": null,
+      "tier": "SKIP",
+      "route_action": "SKIP",
+      "route_exclusion_reason": "explicit_no_sponsorship"
     }
   ]
 }

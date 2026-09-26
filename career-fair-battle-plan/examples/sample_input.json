@@ -1,12 +1,35 @@
 {
   "candidate_profile": {
     "approved": true,
-    "needs_sponsorship": true
+    "cv_present": true,
+    "school": "Example University",
+    "degree": "MS",
+    "graduation_date": "2027-05",
+    "role_types": ["internship"],
+    "target_areas": ["backend-swe", "applied-ai"],
+    "needs_sponsorship": true,
+    "work_authorization": "student work authorization"
   },
   "fair": {
+    "name": "Anonymized Engineering Fair",
+    "platform": "generic",
+    "date": "2026-10-01",
+    "timezone": "America/New_York",
+    "format": "virtual",
+    "source_mode": "UPLOAD",
+    "company_list_present": true,
+    "role_data_present": true,
+    "session_data_present": true,
     "duration_minutes": 90,
     "reserve_minutes": 15,
     "minutes_per_visit": 15
+  },
+  "access": {
+    "authentication_state": "NOT_REQUIRED",
+    "registration_state": "NOT_REQUIRED",
+    "authorization_scope": "NONE",
+    "mutation_allowed": false,
+    "credentials_shared": false
   },
   "evidence_records": [
     {

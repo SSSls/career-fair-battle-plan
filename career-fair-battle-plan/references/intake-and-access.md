@@ -18,13 +18,16 @@ Collect enough information to separate demonstrated fit, user preference, and ha
 
 Do not infer sponsorship need, salary floor, or career preference from nationality, school, major, or prior work. The user must approve the profile before ranking.
 
-## Three source modes
+## Four source modes
 
 1. `UPLOAD`: user-supplied CSV, PDF, screenshots, export, or copied text.
 2. `PUBLIC_WEB`: public event, employer, role, and session pages.
-3. `AUTHENTICATED_READ_ONLY`: a browser tab where the user has logged in and explicitly authorized visible, read-only inspection for the fair.
+3. `PUBLIC_PREVIEW`: a platform preview visible without login or registration. Treat it as partial unless the source proves complete coverage.
+4. `AUTHENTICATED_READ_ONLY`: a browser tab where the user has logged in and explicitly authorized visible, read-only inspection for the fair.
 
-For a live Handshake source, always require login and treat the effective mode as `AUTHENTICATED_READ_ONLY`, even when an event page appears publicly reachable. `PUBLIC_WEB` remains valid for non-Handshake sites. A user-supplied Handshake export is `UPLOAD` and does not require login.
+Handshake public previews may be normalized without registration, but can support only preliminary decisions. Use `AUTHENTICATED_READ_ONLY` for data visible only after login. `PUBLIC_WEB` remains valid for ordinary public pages. A user-supplied Handshake export is `UPLOAD` and does not require login.
+
+Authentication, registration, authorization, and mutation are independent: `authentication_state` is `NOT_REQUIRED | LOGGED_OUT | LOGGED_IN | UNKNOWN`; `registration_state` is `NOT_REQUIRED | NOT_REGISTERED | REGISTERED | UNKNOWN`; `authorization_scope` is `NONE | READ_ONLY`; and `mutation_allowed` must be `false`.
 
 For authenticated access, ask the user to open the site and log in themselves. Never request, receive, persist, or repeat a password; never handle MFA codes, solve CAPTCHAs, bypass access controls, or discover hidden private endpoints. Limit navigation to visible employer, role, and session information.
 
@@ -44,7 +47,7 @@ Possible states:
 - `NEED_FAIR_SOURCE`: obtain an upload, public URL, or user-opened authenticated tab;
 - `NEED_USER_LOGIN`: pause while the user logs in themselves;
 - `NEED_READ_ONLY_AUTHORIZATION`: ask permission to inspect the visible tab;
-- `READY_FOR_INGESTION`: ingest only the available data and preserve gaps as `unknown`.
+- `READY_FOR_INGESTION`: ingest only the available data and preserve gaps as `unknown`. This is normally decision state `PARTIAL`, not proof that final routing is possible.
 
 An incomplete company list or missing role/session details may still be ingested, but the gaps must remain visible and cannot be converted into positive evidence.
 

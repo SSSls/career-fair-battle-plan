@@ -1,35 +1,28 @@
 ---
 name: career-fair-battle-plan
-description: Use when a job seeker needs to prioritize employers, roles, Handshake events, virtual sessions, or career-fair conversations under limited time, especially across career changes, adjacent-field moves, sponsorship constraints, or uncertain target areas.
+description: Use when a job seeker needs to prioritize employers, exact roles, sessions, or career-fair conversations under limited time, including career changes, adjacent moves, sponsorship constraints, public previews, and authenticated read-only fair sources.
 ---
 
 # Career Fair Battle Plan
 
-## Core principle
+Optimize scarce fair time, not generic application worthiness. Keep facts, model judgments, and deterministic policy separate.
 
-Optimize scarce fair time, not generic application worthiness. Keep three layers separate: an LLM understands and writes, Jev makes atomic typed judgments, and code applies weights, hard rules, capacity, and permissions.
+## Route the workflow
 
-## Workflow
-
-1. **Run intake and access gating.** Follow [references/intake-and-access.md](references/intake-and-access.md). Collect the CV/background, school, goals, constraints, and fair metadata; run `assess_intake.py`. Any live Handshake fetch requires user login plus read-only authorization, even if a page appears public. Uploaded exports do not.
-2. **Build the candidate profile.** Produce the contract in [references/data-contracts.md](references/data-contracts.md). Keep demonstrated fit separate from stated preference: prior work does not prove the user wants more of it. Do not stereotype from school, degree, major, nationality, or career-change status.
-3. **Checkpoint.** Show `candidate_profile` and the proposed area set. If `approved` is not explicitly true, stop and ask the user to correct or approve it. Do not research, judge, or rank yet.
-4. **Ingest the fair.** For Handshake and other event sources, follow [references/research-and-events.md](references/research-and-events.md). The unit of analysis is `company × role`, not company alone. Apply obvious eligibility and relevance filters before deep research.
-5. **Build evidence records.** Every material claim carries a URL or supplied-artifact reference, publisher, publication date when available, access date, and `yes | no | unknown`. Distinguish exact-role sponsorship from company history, confirmed HC from a mere job page, and official exact-role salary from secondary estimates.
-6. **Ask Jev atomic questions.** Read [references/jev-judgments.md](references/jev-judgments.md). Send an approved condensed profile, top relevant roles, and evidence—not the full resume. Batch independent questions sharing a state in one `system_one` call. Record the provider and model. If Jev is unavailable, never imply it ran; return `READY_FOR_JEV`, or use a clearly labeled fallback only after the user agrees.
-7. **Rank in code.** Create the JSON input from the contract and run:
-
-   ```bash
-   python3 scripts/rank_battle_plan.py input.json -o battle_plan.json
-   ```
-
-   Do not override its hard demotions, capacity, uncertainty flags, or tiers by prose intuition. Adjust weights/configuration and rerun instead.
-8. **Generate the battle plan.** For `MUST_VISIT` and `IF_TIME`, provide cited reasons, the matched role/area, a short pitch, 2–3 tailored booth questions in English and Chinese, and verified session actions. Include `APPLY_ONLINE`, `SKIP`, review flags, and a time-feasible visit order.
+1. Read [references/intake-and-access.md](references/intake-and-access.md). Collect CV/background, school, goals, work authorization, sponsorship need, location/salary constraints, and fair source. Run `assess_intake.py`.
+2. Build the candidate contract in [references/data-contracts.md](references/data-contracts.md). Separate demonstrated fit, stated preference, pivot areas, and avoid areas. Never infer preferences or eligibility from school, major, nationality, or career-change status.
+3. **Stop for profile approval.** Show the profile and proposed area set. Do not ingest, research, call Jev, or rank until `approved` is explicitly true.
+4. Read [references/source-adapters.md](references/source-adapters.md) and [references/research-and-events.md](references/research-and-events.md). Normalize only visible or supplied data. Use `company × exact role` when available; weaker employer cards remain preliminary leads.
+5. Read [references/decision-states.md](references/decision-states.md). Preserve `STOP`, `PARTIAL`, or `FULL`, independent confidence fields, and every cap/review flag. Unknown access is never schedulable.
+6. Apply deterministic hard filters before semantic evaluation. Exact-role ineligibility, explicit opt-out, duplicates, and unavailable visit routes do not need Jev.
+7. For surviving questions, read [references/jev-judgments.md](references/jev-judgments.md). Use `plan_jev_requests.py`, send only the approved condensed state, validate every result with `validate_jev_results.py`, and label provenance `live`, `fixture`, `fallback`, or `cache`. Never claim Jev ran unless a validated live result proves it.
+8. Run `rank_battle_plan.py`. Do not override hard reasons, confidence gates, capacity, or conflicts in prose; change inputs/config and rerun.
+9. Produce a fair-day plan: cited reason, exact role/area, short pitch, bilingual questions, review flags, `MUST_VISIT`, `IF_TIME`, `APPLY_ONLINE`, `SKIP`, and only verified route slots.
 
 ## Permission boundary
 
-The user must log in themselves. Never request passwords, handle MFA/CAPTCHAs, bypass authentication, or inspect hidden private endpoints. Authenticated access is visible and read-only. Registration, waitlists, email, messages, applications, uploads, or profile edits require explicit confirmation immediately before execution. Never fabricate booth times, available slots, recruiter names, hiring claims, or completed actions.
+The user enters credentials and completes MFA/CAPTCHAs. Read-only authorization covers visible inspection only. Never use hidden endpoints or store credentials. Registration, waitlists, messages, applications, uploads, saves, follows, emails, and profile edits require separate confirmation immediately before execution. A public preview may support preliminary matching without registration; it does not prove full employer coverage, exact jobs, or session availability.
 
-## Output contract
+## Output order
 
-Return these sections in order: approved profile version; assumptions and unknowns; tier summary; time-boxed route; company-role action cards; `APPLY_ONLINE`; review queue; sources; next actions requiring confirmation.
+Approved profile version; source/access state; assumptions and unknowns; decision state and confidence; preliminary priorities or final tiers; verified route; company-role action cards; review queue; sources; actions requiring confirmation.
