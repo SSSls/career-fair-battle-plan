@@ -36,7 +36,7 @@ def opportunity(
         "user_interest": 1.0,
         "evidence": {
             "explicit_no_sponsorship": explicit_no_sponsorship,
-            "session_status": "unknown",
+            "session_status": "verified",
             "visit_access": "verified",
         },
         "judgments": {
@@ -85,6 +85,88 @@ def document(*opportunities, needs_sponsorship=False, duration=180, reserve=30, 
 
 
 class BattlePlanTests(unittest.TestCase):
+    def test_unknown_visit_access_never_gets_fixed_or_flexible_schedule(self):
+        ranker = load_ranker()
+        item = opportunity("Unknown Access Co", "Software Intern")
+        item["evidence"].update(
+            {"visit_access": "unknown", "session_status": "unknown"}
+        )
+
+        plan = ranker.build_battle_plan(document(item))
+        result = plan["opportunities"][0]
+
+        self.assertEqual(result["route_action"], "CHECK_SESSION")
+        self.assertNotIn("assigned_session", result)
+        self.assertFalse(
+            any(
+                visit["company"] == "Unknown Access Co"
+                for visit in plan["visit_schedule"]
+            )
+        )
+        self.assertEqual(result["evidence"]["visit_access"], "unknown")
+        self.assertEqual(result["evidence"]["session_status"], "unknown")
+
+    def test_verified_flexible_booth_is_schedulable(self):
+        plan = load_ranker().build_battle_plan(
+            document(opportunity("Flexible Co", "Software Intern"))
+        )
+
+        result = plan["opportunities"][0]
+        self.assertEqual(result["route_action"], "VISIT")
+        self.assertIn("assigned_session", result)
+        self.assertFalse(plan["visit_schedule"][0]["fixed"])
+
+    def test_verified_fixed_session_preserves_exact_interval(self):
+        item = opportunity("Fixed Co", "Software Intern")
+        item["evidence"]["fixed_session"] = {"start_minute": 30, "end_minute": 45}
+
+        plan = load_ranker().build_battle_plan(document(item))
+
+        result = plan["opportunities"][0]
+        self.assertEqual(result["assigned_session"], {"start_minute": 30.0, "end_minute": 45.0})
+        self.assertTrue(plan["visit_schedule"][0]["fixed"])
+
+    def test_full_session_routes_to_apply_online(self):
+        item = opportunity("Full Session Co", "Software Intern")
+        item["evidence"].update(
+            {"visit_access": "unavailable", "session_status": "full"}
+        )
+
+        result = load_ranker().build_battle_plan(document(item))["opportunities"][0]
+
+        self.assertEqual(result["tier"], "APPLY_ONLINE")
+        self.assertEqual(result["route_action"], "APPLY_ONLINE")
+        self.assertEqual(result["route_exclusion_reason"], "visit_channel_unavailable")
+
+    def test_low_visit_access_confidence_never_enters_schedule(self):
+        item = opportunity("Low Confidence Co", "Software Intern")
+        item["visit_access_confidence"] = 0.79
+
+        plan = load_ranker().build_battle_plan(document(item))
+        result = plan["opportunities"][0]
+
+        self.assertEqual(result["route_action"], "CHECK_SESSION")
+        self.assertEqual(result["route_exclusion_reason"], "visit_access_confidence_below_0.80")
+        self.assertEqual(plan["visit_schedule"], [])
+
+    def test_exact_evidence_scope_survives_output(self):
+        item = opportunity("Scoped Co", "Software Intern")
+        item["evidence_ids"] = ["role-exact"]
+        payload = document(item)
+        payload["evidence_records"] = [
+            {
+                "claim_id": "role-exact",
+                "claim": "Exact role is current.",
+                "scope": "exact_role",
+                "field": "role",
+                "status": "yes",
+            }
+        ]
+
+        result = load_ranker().build_battle_plan(payload)["opportunities"][0]
+
+        self.assertEqual(result["evidence_records"][0]["scope"], "exact_role")
+
     def test_exact_role_no_sponsorship_filters_before_jev_scores_are_required(self):
         ranker = load_ranker()
         item = {

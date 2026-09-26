@@ -346,6 +346,15 @@ def _allocate_flexible_visit(
     return None, free_intervals
 
 
+def _is_schedulable(item: dict[str, Any]) -> bool:
+    evidence = item["evidence"]
+    return (
+        evidence.get("visit_access") == "verified"
+        and item["visit_access_confidence"] >= 0.80
+        and evidence.get("session_status") in {"verified", "available"}
+    )
+
+
 def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
     """Return auditable tiers without making any external action."""
     if not isinstance(document, dict):
@@ -390,6 +399,7 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(evidence_records, list):
         raise ValueError("evidence_records must be a list")
     evidence_record_ids: set[str] = set()
+    evidence_records_by_id: dict[str, dict[str, Any]] = {}
     for index, record in enumerate(evidence_records):
         if not isinstance(record, dict):
             raise ValueError(f"evidence_records[{index}] must be an object")
@@ -402,6 +412,7 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(claim, str) or not claim:
             raise ValueError(f"evidence_records[{index}].claim must be a non-empty string")
         evidence_record_ids.add(claim_id)
+        evidence_records_by_id[claim_id] = dict(record)
 
     evaluated: list[dict[str, Any]] = []
     seen_roles: set[tuple[str, str]] = set()
@@ -507,6 +518,17 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
                 opportunity, confidence_floor, needs_sponsorship
             ) + list(prefilter["review_flags"])
         review_flags = sorted(set(review_flags))
+        default_access_confidence = {
+            "verified": 0.90,
+            "unknown": 0.20,
+            "unavailable": 0.90,
+        }[evidence.get("visit_access", "unknown")]
+        visit_access_confidence = _bounded(
+            opportunity.get("visit_access_confidence", default_access_confidence),
+            f"opportunities[{index}].visit_access_confidence",
+            0,
+            1,
+        )
         critical_names = set(SCORE_FIELDS) | {
             "best_area",
             "visit_access",
@@ -552,6 +574,11 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
                 "review_flags": review_flags,
                 "reasons": prefilter["reasons"],
                 "evidence_ids": evidence_ids,
+                "evidence_records": [
+                    evidence_records_by_id[evidence_id] for evidence_id in evidence_ids
+                ],
+                "evidence": dict(evidence),
+                "visit_access_confidence": visit_access_confidence,
                 "prefilter_state": prefilter["prefilter_state"],
                 "jev_required": prefilter["jev_required"],
                 "decision_state": decision_state,
@@ -585,8 +612,8 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
             continue
         if item["decision_state"] == "PARTIAL":
             continue
-        elif item["_visit_access"] == "unavailable":
-            item["tier"] = "APPLY_ONLINE"
+        elif not _is_schedulable(item):
+            item["tier"] = "IF_TIME" if item["_role_fit"] >= 0.5 else "APPLY_ONLINE"
         elif item["_role_fit"] >= 0.75 and item["_conversation_leverage"] < 0.5:
             item["tier"] = "APPLY_ONLINE"
         elif item["visit_score"] >= 55 and item["_conversation_leverage"] >= 0.5:
@@ -660,6 +687,37 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
                     **item["_assigned_session"],
                 }
             )
+        if item.get("_assigned_session"):
+            item["assigned_session"] = dict(item["_assigned_session"])
+            item["route_action"] = "VISIT"
+            item["route_exclusion_reason"] = None
+        elif "visit_channel_unavailable" in item["reasons"]:
+            item["route_action"] = "APPLY_ONLINE"
+            item["route_exclusion_reason"] = "visit_channel_unavailable"
+        elif item["decision_state"] == "PARTIAL":
+            item["route_action"] = "VERIFY_ROLE"
+            item["route_exclusion_reason"] = "insufficient_exact_role_or_session_evidence"
+        elif item["evidence"].get("visit_access", "unknown") == "unknown":
+            item["route_action"] = "CHECK_SESSION"
+            item["route_exclusion_reason"] = "visit_access_unknown"
+        elif item["visit_access_confidence"] < 0.80:
+            item["route_action"] = "CHECK_SESSION"
+            item["route_exclusion_reason"] = "visit_access_confidence_below_0.80"
+        elif item["evidence"].get("session_status") not in {"verified", "available"}:
+            item["route_action"] = "CHECK_SESSION"
+            item["route_exclusion_reason"] = "session_time_or_channel_unverified"
+        elif "schedule_conflict" in item["review_flags"]:
+            item["route_action"] = "APPLY_ONLINE"
+            item["route_exclusion_reason"] = "schedule_conflict"
+        elif item["tier"] == "APPLY_ONLINE":
+            item["route_action"] = "APPLY_ONLINE"
+            item["route_exclusion_reason"] = "conversation_value_below_visit_threshold"
+        elif item["tier"] == "SKIP":
+            item["route_action"] = "SKIP"
+            item["route_exclusion_reason"] = item["reasons"][0] if item["reasons"] else "low_value"
+        else:
+            item["route_action"] = "CHECK_SESSION"
+            item["route_exclusion_reason"] = "not_scheduled"
         item.pop("_fixed_session")
         item.pop("_requires_review")
         item.pop("_assigned_session", None)
