@@ -694,6 +694,9 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
         elif "visit_channel_unavailable" in item["reasons"]:
             item["route_action"] = "APPLY_ONLINE"
             item["route_exclusion_reason"] = "visit_channel_unavailable"
+        elif item["tier"] == "SKIP":
+            item["route_action"] = "SKIP"
+            item["route_exclusion_reason"] = item["reasons"][0] if item["reasons"] else "low_value"
         elif item["decision_state"] == "PARTIAL":
             item["route_action"] = "VERIFY_ROLE"
             item["route_exclusion_reason"] = "insufficient_exact_role_or_session_evidence"
@@ -712,9 +715,6 @@ def build_battle_plan(document: dict[str, Any]) -> dict[str, Any]:
         elif item["tier"] == "APPLY_ONLINE":
             item["route_action"] = "APPLY_ONLINE"
             item["route_exclusion_reason"] = "conversation_value_below_visit_threshold"
-        elif item["tier"] == "SKIP":
-            item["route_action"] = "SKIP"
-            item["route_exclusion_reason"] = item["reasons"][0] if item["reasons"] else "low_value"
         else:
             item["route_action"] = "CHECK_SESSION"
             item["route_exclusion_reason"] = "not_scheduled"

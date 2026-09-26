@@ -312,6 +312,19 @@ class BattlePlanTests(unittest.TestCase):
         self.assertIn("explicit_no_sponsorship", needs["opportunities"][0]["reasons"])
         self.assertNotEqual(does_not_need["opportunities"][0]["tier"], "SKIP")
 
+    def test_hard_skip_is_not_overridden_by_unknown_session_action(self):
+        blocked = opportunity("BlockedCo", "SWE", explicit_no_sponsorship=True)
+        blocked["evidence"]["visit_access"] = "unknown"
+        blocked["evidence"]["session_status"] = "unknown"
+
+        result = load_ranker().build_battle_plan(
+            document(blocked, needs_sponsorship=True)
+        )["opportunities"][0]
+
+        self.assertEqual(result["tier"], "SKIP")
+        self.assertEqual(result["route_action"], "SKIP")
+        self.assertEqual(result["route_exclusion_reason"], "explicit_no_sponsorship")
+
     def test_unknown_sponsorship_is_review_not_rejection(self):
         ranker = load_ranker()
         unknown = opportunity("UnknownCo", "Data Intern", sponsorship_probability=0.5)
