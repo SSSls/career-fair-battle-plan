@@ -1,0 +1,39 @@
+{
+  "fixture_metadata": {
+    "synthetic_candidate": true,
+    "contains_private_account_data": false,
+    "real_jev_called": false,
+    "derived_from_prior_local_test": true
+  },
+  "case_id": "high-evidence",
+  "candidate_profile": {
+    "approved": true,
+    "background_transition": "none",
+    "target_areas": ["backend-swe", "data-engineering"],
+    "needs_sponsorship": false
+  },
+  "opportunities": [
+    {
+      "company": "Synthetic Atlas Systems",
+      "role": "Backend Engineering Intern",
+      "evidence_level": "SESSION_VERIFIED",
+      "visit_access": "verified",
+      "session_status": "verified",
+      "fixed_session": {"start_minute": 30, "end_minute": 45},
+      "judgment_provenance": "fixture"
+    },
+    {
+      "company": "Synthetic Nimbus Analytics",
+      "role": "Data Engineering Intern",
+      "evidence_level": "EXACT_ROLE",
+      "visit_access": "unknown",
+      "session_status": "unknown",
+      "judgment_provenance": "fixture"
+    }
+  ],
+  "expected": {
+    "decision_state": "FULL",
+    "scheduled_companies": ["Synthetic Atlas Systems"],
+    "unscheduled_companies": ["Synthetic Nimbus Analytics"]
+  }
+}

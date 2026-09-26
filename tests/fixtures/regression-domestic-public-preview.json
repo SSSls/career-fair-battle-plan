@@ -1,0 +1,33 @@
+{
+  "fixture_metadata": {
+    "synthetic_candidate": true,
+    "contains_private_account_data": false,
+    "real_jev_called": false,
+    "derived_from_prior_local_test": true
+  },
+  "case_id": "domestic-public-preview",
+  "candidate_profile": {
+    "approved": true,
+    "background_transition": "none",
+    "target_areas": ["backend-swe", "data-engineering"],
+    "needs_sponsorship": false
+  },
+  "source": {
+    "adapter": "handshake_public_preview",
+    "accessed_at": "2026-09-24",
+    "advertised_employer_count": 11,
+    "employers": [
+      {
+        "name": "Example Software Company",
+        "job_titles": ["Software Engineering Intern"],
+        "work_authorization_text": "US work authorization is required",
+        "session_count": 1
+      }
+    ]
+  },
+  "expected": {
+    "decision_state": "PARTIAL",
+    "visit_schedule_count": 0,
+    "coverage_complete": false
+  }
+}

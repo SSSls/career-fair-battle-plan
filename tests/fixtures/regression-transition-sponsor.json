@@ -1,0 +1,33 @@
+{
+  "fixture_metadata": {
+    "synthetic_candidate": true,
+    "contains_private_account_data": false,
+    "real_jev_called": false,
+    "derived_from_prior_local_test": true
+  },
+  "case_id": "transition-sponsor",
+  "candidate_profile": {
+    "approved": true,
+    "background_transition": "major",
+    "target_areas": ["applied-ml", "data-engineering", "backend-swe"],
+    "needs_sponsorship": true
+  },
+  "opportunities": [
+    {
+      "company": "Synthetic Health Data Lab",
+      "role": "Applied ML Intern",
+      "evidence_level": "EXACT_ROLE",
+      "exact_role_sponsorship": "unknown",
+      "career_stage_clear": false,
+      "conversation_channel": "plausible",
+      "material_unknowns": ["sponsorship", "entry_level_access"]
+    }
+  ],
+  "expected": {
+    "jev_questions": [
+      "background_pathway_accessible",
+      "entry_level_accessible",
+      "sponsorship_evidence_supports_eligibility"
+    ]
+  }
+}

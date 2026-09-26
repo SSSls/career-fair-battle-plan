@@ -1,0 +1,33 @@
+{
+  "fixture_metadata": {
+    "synthetic_candidate": true,
+    "contains_private_account_data": false,
+    "real_jev_called": false,
+    "derived_from_prior_local_test": true
+  },
+  "case_id": "sponsor-public-preview",
+  "candidate_profile": {
+    "approved": true,
+    "background_transition": "adjacent",
+    "target_areas": ["backend-swe", "applied-ml"],
+    "needs_sponsorship": true
+  },
+  "source": {
+    "adapter": "handshake_public_preview",
+    "accessed_at": "2026-09-24",
+    "advertised_employer_count": 11,
+    "employers": [
+      {
+        "name": "Example Trading Company",
+        "job_titles": ["Technology Intern"],
+        "work_authorization_text": "Employer is willing to sponsor candidates",
+        "session_count": 1
+      }
+    ]
+  },
+  "expected": {
+    "decision_state": "PARTIAL",
+    "sponsorship_scope": "employer_event_card",
+    "visit_schedule_count": 0
+  }
+}

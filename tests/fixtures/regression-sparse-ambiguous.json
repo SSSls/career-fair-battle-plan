@@ -1,0 +1,25 @@
+{
+  "fixture_metadata": {
+    "synthetic_candidate": true,
+    "contains_private_account_data": false,
+    "real_jev_called": false,
+    "derived_from_prior_local_test": true
+  },
+  "case_id": "sparse-ambiguous",
+  "candidate_profile": {
+    "approved": false,
+    "background_transition": "unknown",
+    "target_areas": [],
+    "needs_sponsorship": null
+  },
+  "source": {
+    "adapter": "official_school",
+    "accessed_at": "2026-09-24",
+    "fair": {"name": "Synthetic General Career Fair"},
+    "employers": []
+  },
+  "expected": {
+    "decision_state": "STOP",
+    "visit_schedule_count": 0
+  }
+}
