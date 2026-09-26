@@ -369,7 +369,9 @@ def _normalize_handshake_authenticated(document: dict[str, Any]) -> dict[str, An
         "adapter": "handshake_authenticated_read_only",
         "source_mode": "AUTHENTICATED_READ_ONLY",
         "coverage": _coverage(
-            len(employers), document.get("advertised_employer_count"), True
+            len(employers),
+            document.get("advertised_employer_count"),
+            document.get("employer_list_kind") == "complete",
         ),
         "access_requirements": [],
         "leads": leads,

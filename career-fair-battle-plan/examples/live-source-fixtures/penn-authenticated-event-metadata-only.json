@@ -1,0 +1,7 @@
+{
+  "adapter": "handshake_authenticated_read_only",
+  "accessed_at": "2026-09-25",
+  "artifact_reference": "sanitized observation: Penn authenticated event metadata only",
+  "employer_list_kind": "not_observed",
+  "employers": []
+}

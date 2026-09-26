@@ -1,0 +1,9 @@
+{
+  "adapter": "official_school",
+  "accessed_at": "2026-09-25",
+  "source_url": "https://cpdc.osa.cuhk.edu.hk/en/find-a-job/cuhk-careers-fair-2026",
+  "fair": {"name": "CUHK Careers Fair 2026", "date": "2026-03-10"},
+  "login_required_for_employer_list": true,
+  "employer_list_kind": "not_observed",
+  "employers": []
+}

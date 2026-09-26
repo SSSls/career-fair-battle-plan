@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import pathlib
 import unittest
 
@@ -6,6 +7,7 @@ import unittest
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "career-fair-battle-plan" / "scripts" / "normalize_source.py"
 READINESS_SCRIPT = ROOT / "career-fair-battle-plan" / "scripts" / "decision_readiness.py"
+LIVE_FIXTURES = ROOT / "career-fair-battle-plan" / "examples" / "live-source-fixtures"
 
 
 def load_normalizer():
@@ -23,6 +25,27 @@ def load_readiness():
 
 
 class SourceNormalizationTests(unittest.TestCase):
+    def test_sanitized_live_school_fixtures_normalize_without_claiming_complete_coverage(self):
+        expected = {
+            "penn-authenticated-event-metadata-only.json",
+            "penn-public-official.json",
+            "cornell-public-official.json",
+            "berkeley-public-official.json",
+            "toronto-public-official.json",
+            "hku-public-official.json",
+            "cuhk-public-official.json",
+            "hkust-public-official.json",
+        }
+        paths = {path.name: path for path in LIVE_FIXTURES.glob("*.json")}
+        self.assertTrue(expected.issubset(paths))
+        normalizer = load_normalizer()
+        for name in sorted(expected):
+            with self.subTest(name=name):
+                payload = json.loads(paths[name].read_text(encoding="utf-8"))
+                result = normalizer.normalize_source(payload)
+                self.assertFalse(result["coverage"]["complete"])
+                self.assertEqual(result["leads"], [])
+
     def test_public_preview_preserves_partial_coverage_and_unknown_session(self):
         payload = {
             "adapter": "handshake_public_preview",
@@ -142,6 +165,22 @@ class SourceNormalizationTests(unittest.TestCase):
         self.assertEqual(lead["evidence_level"], "SESSION_VERIFIED")
         self.assertEqual(lead["visit_access"], "verified")
         self.assertEqual(lead["session_status"], "available")
+
+    def test_authenticated_event_page_does_not_claim_complete_employer_coverage(self):
+        result = load_normalizer().normalize_source(
+            {
+                "adapter": "handshake_authenticated_read_only",
+                "accessed_at": "2026-09-25",
+                "source_url": "https://fixtures.invalid/authenticated-event-page",
+                "employer_list_kind": "not_observed",
+                "employers": [],
+            }
+        )
+
+        self.assertEqual(
+            result["coverage"],
+            {"visible": 0, "advertised": None, "complete": False},
+        )
 
     def test_duplicate_source_ids_are_rejected(self):
         payload = {

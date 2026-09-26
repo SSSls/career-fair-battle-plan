@@ -369,7 +369,7 @@ tests/
 
 ## 验证情况
 
-- 85 个确定性和文档行为测试；
+- 87 个确定性和文档行为测试；
 - 57 个可编辑参数化场景；
 - 10 个独立 Agent 模拟：3 个无 Skill baseline 和 7 个使用 Skill 的 forward test；
 - 官方 `quick_validate.py` 包结构验证。

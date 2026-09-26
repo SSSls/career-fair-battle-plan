@@ -371,7 +371,7 @@ Missing or conflicting evidence remains `unknown`; historical H-1B/PERM activity
 
 ## Validation
 
-- 85 deterministic and documentation behavior tests;
+- 87 deterministic and documentation behavior tests;
 - 57 editable parameterized scenarios;
 - 10 independent agent simulations: 3 no-skill baselines and 7 skill-enabled forward tests;
 - official `quick_validate.py` package validation.

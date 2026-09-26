@@ -1,0 +1,9 @@
+{
+  "adapter": "official_school",
+  "accessed_at": "2026-09-25",
+  "source_url": "https://career.cornell.edu/cornell-career-fair-days/",
+  "fair": {"name": "2026 Cornell Career Fair Days", "date": "2026-09-15"},
+  "login_required_for_employer_list": true,
+  "employer_list_kind": "featured_only",
+  "employers": []
+}
